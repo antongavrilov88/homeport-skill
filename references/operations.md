@@ -14,6 +14,25 @@ ssh -L 8088:127.0.0.1:8088 <relay, or the exit in the single profile>   # then h
 In the panel: who is online, how much they have used, who takes which
 route, issuing a new client with a QR code, removal, and the direct-domain list.
 
+## Switch an existing server's panel to English
+
+Servers installed before 0.6.0 keep the Russian panel and Russian notifications until you do this; nothing changes on its own. It replaces three files on the machine that runs the panel (the relay, or the exit in the `single` profile) and restarts two services. Only words change: the three files have the same logic in every release, and clients, routes, the admin code and the stats stay as they are. Do it while the panel says **Tunnel OK** (or the Russian «Туннель в порядке»), not during a failover.
+
+From the skill's folder, on the operator's computer:
+
+```bash
+scp scripts/payload/common/dashboard.html scripts/payload/common/vpn-monitor.py \
+    scripts/payload/common/vpn-watchdog.py root@<server>:/root/
+ssh root@<server> 'install -m644 /root/dashboard.html /usr/local/share/vpn-monitor/index.html \
+  && install -m755 /root/vpn-monitor.py /root/vpn-watchdog.py /usr/local/sbin/ \
+  && rm /root/dashboard.html /root/vpn-monitor.py /root/vpn-watchdog.py \
+  && systemctl restart vpn-monitor vpn-watchdog \
+  && systemctl is-active vpn-monitor vpn-watchdog \
+  && curl -s http://127.0.0.1:8088/ | grep -o "<title>[^<]*</title>"'
+```
+
+Expect `active` twice and `<title>VPN traffic</title>`; with a non-default `dashboard_port`, use that port. Then reload the panel in the browser. The monthly drill's notifications stay in Russian in this release. Re-running an installer built from 0.6.0 or later puts the same English files in place.
+
 ## Issue a device from the shell
 
 The panel listens only inside the VPN and on localhost, so the very first device — or any device while the panel is unreachable — is issued through the panel's own API, on the machine that runs it (the relay, or the exit in the `single` profile):
@@ -25,7 +44,7 @@ curl -s -X POST http://127.0.0.1:8088/api/client-new \
   | python3 -c 'import json,sys,base64; r=json.load(sys.stdin); sys.exit(r["error"]) if "error" in r else None; png=base64.b64decode(r["qr"]); open("/root/device.conf","w").write(r["config"]); open("/root/device.png","wb").write(png) if png else None; print(r["ip"], "png" if png else "no qr (qrencode missing) — use the .conf")'
 ```
 
-`port` 443 for a phone on a strict network; `route` `reality` to put the device through the tunnel at once (relay only). Copy `/root/device.png` (the QR) or `/root/device.conf` down with `scp` and hand it over as a file; then delete both from the server. Without a way to move files, `qrencode -t ansiutf8 < /root/device.conf` draws the QR in the terminal and a phone scans it from the screen. The same call is what the «+ Новый клиент» button makes.
+`port` 443 for a phone on a strict network; `route` `reality` to put the device through the tunnel at once (relay only). Copy `/root/device.png` (the QR) or `/root/device.conf` down with `scp` and hand it over as a file; then delete both from the server. Without a way to move files, `qrencode -t ansiutf8 < /root/device.conf` draws the QR in the terminal and a phone scans it from the screen. The same call is what the **+ New client** button makes.
 
 ## Everyday commands (on the relay)
 
@@ -56,7 +75,7 @@ sudo python3 /usr/local/sbin/vpn-split.py
 sudo /usr/local/sbin/vpn-diag.sh
 
 # send a notification by hand (is the alert channel alive?)
-sudo python3 -c "import importlib.util;s=importlib.util.spec_from_file_location('w','/usr/local/sbin/vpn-watchdog.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);print(m.notify('Тест','Проверка'))"
+sudo python3 -c "import importlib.util;s=importlib.util.spec_from_file_location('w','/usr/local/sbin/vpn-watchdog.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);print(m.notify('VPN: test','Checking the alert channel.'))"
 ```
 
 Switching from the panel also writes the set into `/etc/xray/xray-tproxy.nft` so

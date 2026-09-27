@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VPN — трафик</title>
+<title>VPN traffic</title>
 <style>
 :root{
   color-scheme: light;
@@ -165,14 +165,14 @@ body[data-mode="single"] .only-single{display:inline}
 <div class="wrap">
   <header>
     <div>
-      <h1>VPN — трафик</h1>
-      <div class="sub" id="updated">загрузка…</div>
+      <h1>VPN traffic</h1>
+      <div class="sub" id="updated">loading…</div>
     </div>
     <div class="row">
-      <div class="seg" role="group" aria-label="Период">
-        <button data-h="6" aria-pressed="false">6 ч</button>
-        <button data-h="24" aria-pressed="true">24 ч</button>
-        <button data-h="168" aria-pressed="false">7 дней</button>
+      <div class="seg" role="group" aria-label="Period">
+        <button data-h="6" aria-pressed="false">6 h</button>
+        <button data-h="24" aria-pressed="true">24 h</button>
+        <button data-h="168" aria-pressed="false">7 days</button>
       </div>
     </div>
   </header>
@@ -182,68 +182,68 @@ body[data-mode="single"] .only-single{display:inline}
   <div class="tiles" id="tiles"></div>
 
   <section class="card">
-    <h2>Трафик по времени</h2>
-    <p class="hint"><span class="only-multipath">Суммарно вверх и вниз, по маршруту.</span><span class="only-single">Суммарно вверх и вниз.</span> Наведи курсор для точных значений.</p>
+    <h2>Traffic over time</h2>
+    <p class="hint"><span class="only-multipath">Up and down combined, by route.</span><span class="only-single">Up and down combined.</span> Hover for exact values.</p>
     <div class="legend">
-      <span class="only-multipath"><i class="swatch" style="background:var(--series-reality)"></i>Через туннель</span>
-      <span><i class="swatch" style="background:var(--series-wg)"></i><span class="only-multipath">Напрямую (резерв)</span><span class="only-single">Трафик клиентов</span></span>
+      <span class="only-multipath"><i class="swatch" style="background:var(--series-reality)"></i>Through the tunnel</span>
+      <span><i class="swatch" style="background:var(--series-wg)"></i><span class="only-multipath">Direct (fallback)</span><span class="only-single">Client traffic</span></span>
     </div>
     <div id="chart"></div>
   </section>
 
   <section class="card">
-    <h2>Кто сколько прокачал</h2>
-    <p class="hint" id="bars-hint">За выбранный период</p>
+    <h2>Usage per client</h2>
+    <p class="hint" id="bars-hint">For the selected period</p>
     <div id="bars"></div>
   </section>
 
   <section class="card">
-    <h2>Клиенты</h2>
-    <p class="hint"><span class="only-multipath">Маршрут, активность и объём.</span><span class="only-single">Активность и объём.</span> Что именно открывают пользователи — не собирается.</p>
+    <h2>Clients</h2>
+    <p class="hint"><span class="only-multipath">Route, activity and usage.</span><span class="only-single">Activity and usage.</span> What people open is not collected.</p>
     <div class="toolbar">
-      <div class="filters" role="group" aria-label="Фильтр">
-        <button data-f="all" aria-pressed="true">Все</button>
-        <button data-f="online" aria-pressed="false">Онлайн</button>
-        <button class="only-multipath" data-f="reality" aria-pressed="false">Туннель</button>
-        <button class="only-multipath" data-f="wg" aria-pressed="false">Напрямую</button>
+      <div class="filters" role="group" aria-label="Filter">
+        <button data-f="all" aria-pressed="true">All</button>
+        <button data-f="online" aria-pressed="false">Online</button>
+        <button class="only-multipath" data-f="reality" aria-pressed="false">Tunnel</button>
+        <button class="only-multipath" data-f="wg" aria-pressed="false">Direct</button>
       </div>
-      <input class="search" id="q" type="search" placeholder="поиск" autocomplete="off">
+      <input class="search" id="q" type="search" placeholder="search" autocomplete="off">
       <div class="grow"></div>
-      <button class="mini only-multipath" id="all-reality">Всех → туннель</button>
-      <button class="mini only-multipath" id="all-wg">Всех → напрямую</button>
-      <button class="mini" id="new-toggle">+ Новый клиент</button>
+      <button class="mini only-multipath" id="all-reality">All → tunnel</button>
+      <button class="mini only-multipath" id="all-wg">All → direct</button>
+      <button class="mini" id="new-toggle">+ New client</button>
       <span class="saving" id="bulk"></span>
     </div>
     <div class="newform" id="newform">
-      <label>Имя<input id="n-name" type="text" placeholder="Мама, iPad" size="16"></label>
-      <label class="only-multipath">Маршрут<select id="n-route"><option value="reality">через туннель</option><option value="wg">напрямую</option></select></label>
-      <label>Порт<select id="n-port"><option value="51821">51821 (обычный)</option><option value="443">443 (для строгих сетей)</option></select></label>
-      <button class="mini" id="n-create" style="align-self:flex-end;padding:7px 14px">Создать и показать QR</button>
+      <label>Name<input id="n-name" type="text" placeholder="Mum phone" size="16"></label>
+      <label class="only-multipath">Route<select id="n-route"><option value="reality">through the tunnel</option><option value="wg">direct</option></select></label>
+      <label>Port<select id="n-port"><option value="51821">51821 (standard)</option><option value="443">443 (strict networks)</option></select></label>
+      <button class="mini" id="n-create" style="align-self:flex-end;padding:7px 14px">Create and show QR</button>
       <span class="saving" id="n-msg"></span>
     </div>
     <div style="overflow-x:auto"><table id="tbl">
       <thead><tr>
-        <th class="sortable" data-s="name">Клиент<span class="arrow"></span></th>
-        <th class="sortable col-path only-multipath" data-s="path">Маршрут<span class="arrow"></span></th>
-        <th class="sortable" data-s="hs">Активность<span class="arrow"></span></th>
-        <th class="sortable num" data-s="rx">Вниз<span class="arrow"></span></th>
-        <th class="sortable num" data-s="tx">Вверх<span class="arrow"></span></th>
-        <th class="sortable num" data-s="sum">Всего<span class="arrow"></span></th>
+        <th class="sortable" data-s="name">Client<span class="arrow"></span></th>
+        <th class="sortable col-path only-multipath" data-s="path">Route<span class="arrow"></span></th>
+        <th class="sortable" data-s="hs">Activity<span class="arrow"></span></th>
+        <th class="sortable num" data-s="rx">Down<span class="arrow"></span></th>
+        <th class="sortable num" data-s="tx">Up<span class="arrow"></span></th>
+        <th class="sortable num" data-s="sum">Total<span class="arrow"></span></th>
         <th></th>
       </tr></thead><tbody></tbody>
     </table></div>
-    <p class="privacy">Собираются только счётчики байт и время последнего рукопожатия WireGuard.
-      Адреса сайтов, домены, порты и содержимое трафика не записываются нигде — ни здесь, ни в логах Xray.</p>
+    <p class="privacy">Only byte counters and the last WireGuard handshake are kept.
+      Site addresses, domains, ports and traffic content are not recorded anywhere — not here, not in the Xray logs.</p>
   </section>
 
   <section class="card only-multipath">
-    <h2>Исключения — идут напрямую с релея</h2>
-    <p class="hint">Эти домены не заворачиваются в туннель: запрос уходит с адреса релея. Сюда — приложения,
-      которые отказываются работать через VPN: банки, госпорталы и всё, что ругается на зарубежный IP. Поддомены включаются сами: <code>vk.com</code> покрывает и <code>m.vk.com</code>.</p>
+    <h2>Exceptions — go direct from the relay</h2>
+    <p class="hint">These domains skip the tunnel: requests leave from the relay's address. Add apps
+      that refuse VPN connections: banks, government portals, anything that objects to a foreign IP. Subdomains are included: <code>example.com</code> also covers <code>m.example.com</code>.</p>
     <div class="tags" id="direct"></div>
     <div class="addrow">
-      <input id="dom" type="text" placeholder="например, mybank.example" autocomplete="off" spellcheck="false">
-      <button id="add">Добавить</button><span class="saving" id="saving"></span>
+      <input id="dom" type="text" placeholder="e.g. mybank.example" autocomplete="off" spellcheck="false">
+      <button id="add">Add</button><span class="saving" id="saving"></span>
     </div>
   </section>
 
@@ -261,24 +261,24 @@ function setToken(v) { try { localStorage.setItem(TOKKEY, v); } catch (e) {} }
 
 const fmt = b => {
   if (!b) return "0";
-  const u = ["Б","КБ","МБ","ГБ","ТБ"];
+  const u = ["B","KB","MB","GB","TB"];
   let i = 0; while (b >= 1024 && i < u.length-1) { b /= 1024; i++; }
   return (b >= 100 || i === 0 ? Math.round(b) : b.toFixed(1)) + " " + u[i];
 };
 const fmtRate = bps => {
   const m = bps * 8 / 1e6;
-  return m >= 10 ? Math.round(m) + " Мбит/с" : m >= 0.1 ? m.toFixed(1) + " Мбит/с" : Math.round(bps*8/1e3) + " кбит/с";
+  return m >= 10 ? Math.round(m) + " Mbit/s" : m >= 0.1 ? m.toFixed(1) + " Mbit/s" : Math.round(bps*8/1e3) + " kbit/s";
 };
 const ago = ts => {
-  if (!ts) return "никогда";
+  if (!ts) return "never";
   const s = Math.floor(Date.now()/1000) - ts;
-  if (s < 90) return "только что";
-  if (s < 3600) return Math.floor(s/60) + " мин назад";
-  if (s < 86400) return Math.floor(s/3600) + " ч назад";
-  return Math.floor(s/86400) + " дн назад";
+  if (s < 90) return "just now";
+  if (s < 3600) return Math.floor(s/60) + " min ago";
+  if (s < 86400) return Math.floor(s/3600) + " h ago";
+  return Math.floor(s/86400) + " d ago";
 };
-const hhmm = ts => new Date(ts*1000).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
-const dayHM = ts => new Date(ts*1000).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const hhmm = ts => new Date(ts*1000).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+const dayHM = ts => new Date(ts*1000).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 
 function presence(d) {
   const on = d.clients.filter(c => c.online);
@@ -287,13 +287,13 @@ function presence(d) {
   const chips = on.map(c => `<span class="p"><i class="live"></i>${c.name}</span>`).join("");
   $("#presence").innerHTML = `
     <div>
-      <div class="pres-num"><span class="n">${on.length}</span><span class="of">из ${d.clients.length}</span></div>
-      <div class="pres-label">сейчас онлайн</div>
+      <div class="pres-num"><span class="n">${on.length}</span><span class="of">of ${d.clients.length}</span></div>
+      <div class="pres-label">online now</div>
     </div>
     <div class="pres-body">
-      ${on.length ? `<div class="who">${chips}</div>` : '<p class="pres-none">Никто не подключён.</p>'}
+      ${on.length ? `<div class="who">${chips}</div>` : '<p class="pres-none">Nobody is connected.</p>'}
       ${off.length ? `<p class="pres-label" style="margin-top:12px;text-transform:none;letter-spacing:0;font-size:12.5px">
-        ${off.length} офлайн${recent ? ` · последним был ${recent.name}, ${ago(recent.hs)}` : ""}</p>` : ""}
+        ${off.length} offline${recent ? ` · last seen: ${recent.name}, ${ago(recent.hs)}` : ""}</p>` : ""}
     </div>`;
 }
 
@@ -302,9 +302,9 @@ function tiles(d) {
   const on = d.clients.filter(c=>c.online).length;
   const peak = Math.max(0, ...d.series.map(s=>(s.reality+s.wg)/d.bucket));
   const t = [
-    ["Всего за период", fmt(R+W)],
-    ...(SINGLE ? [] : [["Через туннель", fmt(R)], ["Напрямую", fmt(W)]]),
-    ["Пик скорости", fmtRate(peak)],
+    ["Total for the period", fmt(R+W)],
+    ...(SINGLE ? [] : [["Through the tunnel", fmt(R)], ["Direct", fmt(W)]]),
+    ["Peak speed", fmtRate(peak)],
   ];
   $("#tiles").innerHTML = t.map(([l,v])=>{
     const p = String(v).split(" ");
@@ -316,7 +316,7 @@ function chart(d) {
   const el = $("#chart"), W = el.clientWidth || 800, H = 220;
   const m = {t:10,r:8,b:24,l:52}, iw = W-m.l-m.r, ih = H-m.t-m.b;
   const pts = d.series;
-  if (!pts.length) { el.innerHTML = '<p class="hint">Данных пока нет — сбор идёт раз в минуту.</p>'; return; }
+  if (!pts.length) { el.innerHTML = '<p class="hint">No data yet — collected once a minute.</p>'; return; }
   const t0 = d.now - d.hours*3600, t1 = d.now;
   const maxV = Math.max(1, ...pts.map(p=>Math.max(p.reality,p.wg)/d.bucket));
   const x = t => m.l + (t-t0)/(t1-t0)*iw;
@@ -327,7 +327,7 @@ function chart(d) {
   const xt = [];
   const step = Math.max(1, Math.round(pts.length/6));
   for (let i=0;i<pts.length;i+=step) xt.push(pts[i].t);
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="График трафика">
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Traffic chart">
     <g class="grid">${gy.map(v=>`<line x1="${m.l}" x2="${W-m.r}" y1="${v.toFixed(1)}" y2="${v.toFixed(1)}"/>`).join("")}</g>
     <g class="axis">
       ${gy.map((v,i)=>`<text x="${m.l-8}" y="${(v+4).toFixed(1)}" text-anchor="end">${ly[i]}</text>`).join("")}
@@ -366,7 +366,7 @@ function chart(d) {
 
 function bars(d) {
   const rows = d.clients.filter(c=>c.rx+c.tx>0);
-  if (!rows.length) { $("#bars").innerHTML = '<p class="hint">За период трафика не было.</p>'; return; }
+  if (!rows.length) { $("#bars").innerHTML = '<p class="hint">No traffic in this period.</p>'; return; }
   const max = Math.max(...rows.map(c=>c.rx+c.tx));
   $("#bars").innerHTML = rows.map(c=>{
     const v = c.rx+c.tx, col = c.path==="reality" ? "var(--series-reality)" : "var(--series-wg)";
@@ -382,15 +382,15 @@ function banner(d) {
   const el = $("#banner");
   if (!h.watchdog) {
     el.innerHTML = `<div class="banner"><i class="bdot" style="background:var(--muted-dot)"></i>
-      <div><b>Сторож не запущен</b><span>Автоматическая проверка туннеля и переключение на запасной путь сейчас не работают.</span></div></div>`;
+      <div><b>Watchdog not running</b><span>Automatic tunnel checks and switching to the fallback route are off right now.</span></div></div>`;
     return;
   }
   const t = h.tunnel || "ok";
   const map = {
-    ok:   ["var(--good)", "Туннель в порядке", "Проверка каждые 30 секунд, последняя — " + hhmm(h.checked_at || d.now) + "."],
-    degraded: ["var(--series-wg)", "Туннель не отвечает", "Идут попытки починить: перезапуск Xray, затем автоматический откат на WireGuard."],
-    down: ["var(--series-wg)", "Туннель лежит, все переведены на запасной путь", (h.fallback_ok === false ? "Внимание: запасной WireGuard тоже не отвечает." : "Клиенты работают через старый WireGuard. Верну обратно автоматически.")],
-    recovering: ["var(--good)", "Связь вернулась, проверяю стабильность", "Ещё несколько успешных проверок — и клиенты вернутся на быстрый путь."],
+    ok:   ["var(--good)", "Tunnel OK", "Checked every 30 seconds, last at " + hhmm(h.checked_at || d.now) + "."],
+    degraded: ["var(--series-wg)", "Tunnel not responding", "Repair in progress: restarting Xray, then switching to WireGuard automatically."],
+    down: ["var(--series-wg)", "Tunnel down, everyone on the fallback route", (h.fallback_ok === false ? "Warning: the WireGuard fallback is not responding either." : "Clients are on the WireGuard fallback. They will be switched back automatically.")],
+    recovering: ["var(--good)", "Connection back, checking stability", "A few more good checks and clients go back to the fast route."],
   };
   const [c, title, sub] = map[t] || map.ok;
   el.innerHTML = `<div class="banner ${t === "ok" || t === "recovering" ? "ok" : "bad"}">
@@ -401,12 +401,12 @@ async function post(url, body, retry = true) {
   const r = await fetch(url, {method:"POST",
     headers:{"Content-Type":"application/json", "X-Admin-Token": token()}, body: JSON.stringify(body)});
   if (r.status === 403 && retry) {
-    const t = prompt("Код администратора (спроси у того, кто ставил VPN):", "");
-    if (!t) throw new Error("нужен код");
+    const t = prompt("Admin code (ask whoever set up the VPN):", "");
+    if (!t) throw new Error("code required");
     setToken(t.trim());
     return post(url, body, false);
   }
-  if (!r.ok) throw new Error((await r.json().catch(()=>({}))).error || "ошибка");
+  if (!r.ok) throw new Error((await r.json().catch(()=>({}))).error || "error");
   const j = await r.json();
   if (j.error) throw new Error(j.error);
   return j;
@@ -421,35 +421,35 @@ function showModal(html) {
 function configModal(r, title) {
   const b64 = "data:application/octet-stream;base64," + btoa(unescape(encodeURIComponent(r.config)));
   showModal(`<h3>${title}</h3>
-    <p class="sub">${r.ip} · ${r.file}${r.route === "reality" ? " · через туннель" : ""}</p>
-    ${r.qr ? `<img src="data:image/png;base64,${r.qr}" alt="QR-код конфигурации">` : ""}
+    <p class="sub">${r.ip} · ${r.file}${r.route === "reality" ? " · through the tunnel" : ""}</p>
+    ${r.qr ? `<img src="data:image/png;base64,${r.qr}" alt="Config QR code">` : ""}
     <pre>${r.config.replace(/[<>&]/g, ch => ({"<":"&lt;",">":"&gt;","&":"&amp;"}[ch]))}</pre>
     <div class="row">
-      <a class="mini" style="text-decoration:none;padding:6px 12px" href="${b64}" download="${r.file}">Скачать .conf</a>
-      <button class="mini" id="cp">Скопировать</button>
-      <button class="mini close">Закрыть</button>
+      <a class="mini" style="text-decoration:none;padding:6px 12px" href="${b64}" download="${r.file}">Download .conf</a>
+      <button class="mini" id="cp">Copy</button>
+      <button class="mini close">Close</button>
     </div>`);
   const cp = $("#cp");
   if (cp) cp.addEventListener("click", () => {
-    navigator.clipboard.writeText(r.config).then(() => cp.textContent = "скопировано").catch(() => cp.textContent = "не вышло");
+    navigator.clipboard.writeText(r.config).then(() => cp.textContent = "copied").catch(() => cp.textContent = "failed");
   });
 }
 
 async function togglePath(ip, path, btn) {
   btn.disabled = true; btn.textContent = "…";
   try { await post("/api/client-path", {ip, path}); await load(); }
-  catch (e) { btn.textContent = "ошибка"; }
+  catch (e) { btn.textContent = "error"; }
 }
 
 function directList(d) {
   const box = $("#direct"), list = d.direct || [];
   box.innerHTML = list.length
-    ? list.map(dm => `<span class="tag">${dm}<button title="Убрать" data-d="${dm}">×</button></span>`).join("")
-    : '<span class="hint">Список пуст — весь трафик идёт через туннель.</span>';
+    ? list.map(dm => `<span class="tag">${dm}<button title="Remove" data-d="${dm}">×</button></span>`).join("")
+    : '<span class="hint">The list is empty — all traffic goes through the tunnel.</span>';
   box.querySelectorAll("button").forEach(b => b.addEventListener("click", async () => {
-    $("#saving").textContent = "сохраняю…";
-    try { await post("/api/direct", {action:"del", domain:b.dataset.d}); await load(); $("#saving").textContent = "готово"; }
-    catch (e) { $("#saving").textContent = "ошибка"; }
+    $("#saving").textContent = "saving…";
+    try { await post("/api/direct", {action:"del", domain:b.dataset.d}); await load(); $("#saving").textContent = "done"; }
+    catch (e) { $("#saving").textContent = "error"; }
     setTimeout(()=>$("#saving").textContent="", 2500);
   }));
 }
@@ -472,13 +472,13 @@ function table(d) {
     const col = c.path==="reality" ? "var(--series-reality)" : "var(--series-wg)";
     return `<tr>
       <td><span class="name">${c.name}</span><span class="ip">${c.ip}</span></td>
-      <td class="col-path only-multipath"><span class="badge"><i class="dot-s" style="background:${col}"></i>${c.path==="reality"?"туннель":"напрямую"}</span></td>
-      <td><span class="badge"><i class="dot-s" style="background:${c.online?"var(--good)":"var(--muted-dot)"}"></i>${c.online?"онлайн":ago(c.hs)}</span></td>
+      <td class="col-path only-multipath"><span class="badge"><i class="dot-s" style="background:${col}"></i>${c.path==="reality"?"tunnel":"direct"}</span></td>
+      <td><span class="badge"><i class="dot-s" style="background:${c.online?"var(--good)":"var(--muted-dot)"}"></i>${c.online?"online":ago(c.hs)}</span></td>
       <td class="num">${fmt(c.rx)}</td><td class="num">${fmt(c.tx)}</td><td class="num">${fmt(c.rx+c.tx)}</td>
       <td class="actions">
-        <button class="mini" data-cfg="${c.ip}">конфиг</button>
-        <button class="mini only-multipath ${c.path==="reality"?"on":""}" data-ip="${c.ip}" data-to="${c.path==="reality"?"wg":"reality"}">${c.path==="reality"?"напрямую":"→ туннель"}</button>
-        <button class="mini danger" data-del="${c.ip}" data-name="${c.name}" title="Удалить клиента">×</button>
+        <button class="mini" data-cfg="${c.ip}">config</button>
+        <button class="mini only-multipath ${c.path==="reality"?"on":""}" data-ip="${c.ip}" data-to="${c.path==="reality"?"wg":"reality"}">${c.path==="reality"?"direct":"→ tunnel"}</button>
+        <button class="mini danger" data-del="${c.ip}" data-name="${c.name}" title="Delete client">×</button>
       </td>
     </tr>`;
   }).join("");
@@ -489,15 +489,15 @@ function table(d) {
     b.disabled = true; const old = b.textContent; b.textContent = "…";
     try {
       const r = await post("/api/client-config", {ip: b.dataset.cfg});
-      configModal(r, "Конфигурация клиента");
+      configModal(r, "Client config");
     } catch (e) {
-      showModal(`<h3>Конфиг недоступен</h3><p class="sub err">${e.message}</p>
-        <div class="row"><button class="mini close">Закрыть</button></div>`);
+      showModal(`<h3>Config unavailable</h3><p class="sub err">${e.message}</p>
+        <div class="row"><button class="mini close">Close</button></div>`);
     }
     b.disabled = false; b.textContent = old;
   }));
   tb.querySelectorAll("button[data-del]").forEach(b => b.addEventListener("click", async () => {
-    if (!confirm(`Удалить клиента «${b.dataset.name}»? Его устройство потеряет доступ.`)) return;
+    if (!confirm(`Delete client “${b.dataset.name}”? Their device will lose access.`)) return;
     b.disabled = true;
     try { await post("/api/client-delete", {ip: b.dataset.del}); await load(); }
     catch (e) { alert(e.message); b.disabled = false; }
@@ -510,11 +510,11 @@ async function load() {
     data = await r.json();
     SINGLE = data.mode === "single";
     document.body.dataset.mode = SINGLE ? "single" : "multipath";
-    $("#updated").textContent = "обновлено " + hhmm(data.now) + " · сбор раз в минуту";
-    $("#bars-hint").textContent = hours===6?"За 6 часов":hours===24?"За 24 часа":"За 7 дней";
+    $("#updated").textContent = "updated " + hhmm(data.now) + " · collected once a minute";
+    $("#bars-hint").textContent = hours===6?"Last 6 hours":hours===24?"Last 24 hours":"Last 7 days";
     banner(data); presence(data); tiles(data); chart(data); bars(data); table(data); directList(data);
   } catch (e) {
-    $("#updated").innerHTML = '<span class="err">нет связи с сервером статистики</span>';
+    $("#updated").innerHTML = '<span class="err">cannot reach the stats server</span>';
   }
 }
 document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
@@ -534,17 +534,17 @@ document.querySelectorAll("th.sortable").forEach(th => th.addEventListener("clic
 $("#new-toggle").addEventListener("click", () => $("#newform").classList.toggle("open"));
 async function createClient() {
   const btn = $("#n-create"), name = $("#n-name").value.trim();
-  if (!name) { $("#n-msg").textContent = "нужно имя"; $("#n-name").focus(); return; }
-  btn.disabled = true; $("#n-msg").textContent = "создаю…";
+  if (!name) { $("#n-msg").textContent = "name required"; $("#n-name").focus(); return; }
+  btn.disabled = true; $("#n-msg").textContent = "creating…";
   try {
     const r = await post("/api/client-new", {name, route: $("#n-route").value, port: $("#n-port").value});
     $("#n-msg").textContent = ""; $("#n-name").value = ""; $("#newform").classList.remove("open");
-    configModal(r, "Новый клиент: " + r.name);
+    configModal(r, "New client: " + r.name);
     await load();
   } catch (e) {
-    $("#n-msg").textContent = e.message || "не получилось";
-    showModal(`<h3>Не удалось создать клиента</h3><p class="sub err">${e.message || "неизвестная ошибка"}</p>
-      <div class="row"><button class="mini close">Закрыть</button></div>`);
+    $("#n-msg").textContent = e.message || "failed";
+    showModal(`<h3>Couldn't create the client</h3><p class="sub err">${e.message || "unknown error"}</p>
+      <div class="row"><button class="mini close">Close</button></div>`);
   }
   btn.disabled = false;
 }
@@ -558,12 +558,12 @@ $("#all-wg").addEventListener("click", () => bulk("wg"));
 async function bulk(path) {
   if (!data) return;
   const targets = data.clients.filter(c => c.path !== path);
-  if (!targets.length) { $("#bulk").textContent = "уже все там"; setTimeout(()=>$("#bulk").textContent="",2000); return; }
-  $("#bulk").textContent = `переключаю ${targets.length}…`;
+  if (!targets.length) { $("#bulk").textContent = "already all there"; setTimeout(()=>$("#bulk").textContent="",2000); return; }
+  $("#bulk").textContent = `switching ${targets.length}…`;
   try {
     for (const c of targets) await post("/api/client-path", {ip: c.ip, path});
-    await load(); $("#bulk").textContent = "готово";
-  } catch (e) { $("#bulk").textContent = "ошибка"; }
+    await load(); $("#bulk").textContent = "done";
+  } catch (e) { $("#bulk").textContent = "error"; }
   setTimeout(()=>$("#bulk").textContent="", 2500);
 }
 $("#add").addEventListener("click", addDomain);
@@ -571,9 +571,9 @@ $("#dom").addEventListener("keydown", e => { if (e.key === "Enter") addDomain();
 async function addDomain() {
   const v = $("#dom").value.trim().toLowerCase().replace(/^https?:\/\//,"").replace(/\/.*$/,"").replace(/^\./,"");
   if (!v) return;
-  $("#saving").textContent = "сохраняю…";
-  try { await post("/api/direct", {action:"add", domain:v}); $("#dom").value=""; await load(); $("#saving").textContent="готово"; }
-  catch (e) { $("#saving").textContent = "не похоже на домен"; }
+  $("#saving").textContent = "saving…";
+  try { await post("/api/direct", {action:"add", domain:v}); $("#dom").value=""; await load(); $("#saving").textContent="done"; }
+  catch (e) { $("#saving").textContent = "doesn't look like a domain"; }
   setTimeout(()=>$("#saving").textContent="", 2500);
 }
 addEventListener("resize", () => data && chart(data));

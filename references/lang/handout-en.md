@@ -35,12 +35,12 @@ Keep this file. It has everything you need to use the VPN and not call for help 
 1. Connect to the VPN from any device that is already set up.
 2. Open **{dash}** in a browser.
 3. If it asks for a code, enter **{token}**.
-4. The panel is in Russian for now. Press **«+ Новый клиент»** ("New client"), type a name (for example "Mum's phone"), press **«Создать и показать QR»** ("Create and show the QR").
+4. Press **+ New client**, type a name (for example "Mum phone"), press **Create and show QR**.
 5. On the new device open the **WireGuard** app and scan the QR code.
 
 The WireGuard app is free and available everywhere: App Store, Google Play, and wireguard.com for computers.
 
-**If the device is on a network where the VPN won't connect** (a hotel, the underground, office Wi-Fi), pick port **443 (для строгих сетей — "for strict networks")** instead of the usual one when creating the device. That kind of connection gets through almost everywhere.
+**If the device is on a network where the VPN won't connect** (a hotel, the underground, office Wi-Fi), pick port **443 (strict networks)** instead of the usual one when creating the device. That kind of connection gets through almost everywhere.
 
 ---
 
@@ -54,9 +54,9 @@ The panel opens **only while you are connected to the VPN**. From outside it doe
 
 **What is NOT collected and stored anywhere:** which sites people open, what they search for, what they watch. Only a megabyte counter per device. That is not "we promise" — it is how the thing is built: logging is off.
 
-The buttons you may need: «Скачать .conf» — download the config file for a computer; «Онлайн» — show only online devices.
+The buttons you may need: **Download .conf** — the config file for a computer; **Online** — show only online devices.
 <!-- relay only: -->
-«Всех → туннель» / «Всех → напрямую» — everyone through the tunnel / everyone direct.
+**All → tunnel** / **All → direct** — everyone through the tunnel / everyone direct.
 
 ---
 
@@ -70,7 +70,7 @@ Install the **ntfy** app (App Store / Google Play). In it:
 3. Topic name: `{ntfy_topic}`
 4. Login `{ntfy_user}`, password `{ntfy_pass}`
 
-It only writes when it matters: when something broke and when it fixed itself. The notifications are in Russian for now; the titles are listed at the end of this file.
+It only writes when it matters: when something broke and when it fixed itself. The titles are listed at the end of this file.
 <!-- relay only: -->
 Once a month, at night, the system tests itself — that test also sends a short report, which is normal.
 
@@ -139,14 +139,14 @@ The keys and passwords are in a separate file, `params.json`. **It must not be l
 <!-- Include only when notifications are set up -->
 ## What the notifications mean
 
-| Title (Russian) | Meaning |
+| Title | Meaning |
 |---|---|
-| «VPN: сервер не отвечает» | the server isn't responding |
-| «VPN: сервер снова отвечает» | the server is responding again |
-| «VPN: сервер всё ещё не отвечает» | the server is still not responding |
+| VPN: server not responding | the server isn't responding |
+| VPN: server responding again | the server is responding again |
+| VPN: server still not responding | the server is still not responding |
 <!-- relay only: the rows below -->
-| «VPN: туннель упал, все переведены на запасной путь» | the tunnel is down, everyone moved to the fallback route |
-| «VPN: туннель восстановился» | the tunnel is back |
-| «VPN: запасной путь не отвечает» | the fallback route isn't responding — worth a look |
-| «VPN: основной канал всё ещё лежит» | the main channel is still down |
-| «Учения: всё сработало» / «Учения: есть замечания» | the monthly self-test: all good / needs a look |
+| VPN: tunnel down, everyone moved to the fallback route | the tunnel is down, everyone moved to the fallback route |
+| VPN: tunnel restored | the tunnel is back |
+| VPN: fallback route not responding | the fallback route isn't responding — worth a look |
+| VPN: tunnel still down | the tunnel is still down |
+| «Учения: всё сработало» / «Учения: есть замечания» (in Russian) | the monthly self-test: all good / needs a look |
