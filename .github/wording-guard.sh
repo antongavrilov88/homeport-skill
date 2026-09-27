@@ -27,7 +27,6 @@ OLD_NAME_ALLOWED='formerly Burrow
 Upgrading from Burrow
 marketplace remove burrow
 ~/\.claude/skills/burrow
-"burrow": "homeport"
 \.claude-plugin/(plugin|marketplace)\.json:[0-9]+: *"burrow"$'
 OLD_HITS=$(grep -rniw 'burrow' \
   --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \

@@ -7,9 +7,6 @@
   "metadata": {
     "description": "Homeport: your own VPN on a server you rent, set up by Claude."
   },
-  "renames": {
-    "burrow": "homeport"
-  },
   "plugins": [
     {
       "name": "homeport",
