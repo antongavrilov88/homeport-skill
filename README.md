@@ -2,7 +2,7 @@
 
 **Your own VPN on a server you rent: your own address, not one shared with thousands of strangers.**
 
-Homeport is a free [Claude](https://claude.ai) skill that turns a $6 cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel in English, and you add phones and laptops by scanning a QR code.
+Homeport is a free [Claude](https://claude.ai) skill that turns a cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel in English, and you add phones and laptops by scanning a QR code.
 
 How long it takes: your clicks, then about 10 minutes while it installs. A new domain takes 15 minutes to a few hours to go live, and a new hosting account is sometimes reviewed for a few hours.
 
@@ -145,14 +145,14 @@ The old repository URL keeps redirecting, but the old plugin and folder names no
 
 The skill does everything it technically can. These four things it can't, because they need your card, your email or your phone in hand — and by design Homeport never does them for you:
 
-1. **Create a hosting account** and attach a payment method. DigitalOcean (`$6/month`, 1 TB traffic) is the automated path; any Ubuntu 24.04 VPS works with a few more clicks on your side — [Hetzner](references/providers/hetzner.md), [Vultr](references/providers/vultr.md), [anything else](references/providers/generic-ubuntu.md). No card that works? [`references/provisioning.md`](references/provisioning.md) has a dated list of hosts that take crypto or regional cards.
+1. **Create a hosting account** and attach a payment method. DigitalOcean (the s-1vcpu-1gb droplet, 1 TB traffic a month) is the automated path; any Ubuntu 24.04 VPS works with a few more clicks on your side — [Hetzner](references/providers/hetzner.md), [Vultr](references/providers/vultr.md), [anything else](references/providers/generic-ubuntu.md). No card that works? [`references/provisioning.md`](references/provisioning.md) has a dated list of hosts that take crypto or regional cards.
 2. **Give Claude an API token** for that account (so it can create the server instead of dictating twenty clicks), and revoke it afterwards. The skill reminds you.
 3. **Buy a domain** — any cheap, neutral name you don't care about. It is the cover story, and a domain can get banned along with the IP.
 4. **Point the domain** at the server: either delegate it to DigitalOcean nameservers or add three A-records by hand. Step-by-step instructions for the common registrars are built in.
 
 For the `relay` profile you also rent a small VPS in the home country and paste one command into a terminal; the skill walks you through that too, including "the password won't show while you type".
 
-Budget: about **$6–7/month** for `single`, plus a domain (~$10/year); `relay` adds a ~$4–8/month VPS.
+Budget: a small server (DigitalOcean listed the size the skill creates at $6/month before tax on 27 Sep 2026) plus a domain; `relay` adds a small VPS in the home country. Your host and registrar set the prices; the skill tells you the host's listed price before it creates anything.
 
 ---
 

@@ -11,7 +11,8 @@ Variables:
   {exit_ip}    exit_ip
   {relay_ip}   relay_ip                                       relay profile only
   {push_domain} {ntfy_topic} {ntfy_user} {ntfy_pass}          from params.json
-  {price_exit} default "$6"; {price_relay} as agreed with the person
+  {price_exit}  the monthly price quoted at setup (the host's listed price, before tax); no default
+  {price_relay} the relay's monthly price quoted at setup
 
 Rules (the same ones the script applies):
   1. NOTIFICATIONS: use the full block only if ntfy_alert_token or push_domain is set;
@@ -82,7 +83,7 @@ Notifications were not set up.
 ## What it costs
 
 - the server abroad — **{price_exit} a month**
-- the domain — **about $10 a year**
+- the domain — **once a year, what the registrar charges**
 <!-- MONEY: relay only — add this third line; single stops at two -->
 - the server in your country — **{price_relay}**
 

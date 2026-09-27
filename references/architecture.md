@@ -98,10 +98,10 @@ notification.
 
 ## Limits and money
 
-- **Traffic** is the main ceiling. A $6 DigitalOcean droplet comes with 1 TB/month.
+- **Traffic** is the main ceiling. The s-1vcpu-1gb DigitalOcean droplet comes with 1 TB/month.
   Real consumption for a family of several people is on the order of 10–15 GB/day,
   i.e. 300–450 GB. Bottom line: **10–15 ordinary devices** or 4–5 active HD
-  viewers. The cure is the $12 droplet (2 TB), not a redesign.
+  viewers. The cure is the next size up (2 TB), not a redesign.
 - **CPU** tops out at roughly a gigabit — which is to say it does not top out.
 - **The relay's outbound traffic** is billed separately at its provider's rates.
   Split routing (home-country domains bypassing the tunnel) cuts it noticeably.

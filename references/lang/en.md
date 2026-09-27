@@ -35,14 +35,14 @@ Notifications: "Do you want your phone to tell you if something breaks?"
 
 [relay] "Can a small server be rented in the country where they live — by you, or by someone there with a local card?"
 
-Money — one paragraph, no confirmation asked:
+Money — one paragraph, no confirmation asked. `<price>` is the monthly price the host lists today, never a number from memory: from `provision-do.py price` for DigitalOcean, otherwise read off the host's page by the person (`SKILL.md`, step 0). If you don't have it yet, ask for it first — DigitalOcean: "Open digitalocean.com/pricing/droplets and tell me the monthly price of the Basic server with 1 GB of memory and 1 CPU."; another host: "Open their prices page and tell me the monthly price of the plan we'll take."
 
-- `single`: "Here's what it comes to: a server abroad is about six dollars a month, the domain about ten dollars a year. All in, around seven dollars a month."
-- `relay`: "Here's what it comes to: a server abroad is about six dollars a month, the domain about ten dollars a year, and a small server in the country where they live, usually four to eight dollars a month on a flat-rate plan. All in, around twelve dollars a month."
+- `single`: "Here's what it comes to: the server abroad is <price> a month — that's the price the host lists today, before tax. The domain is once a year, at the price the registrar shows at checkout."
+- `relay`: "Here's what it comes to: the server abroad is <price> a month, and the small server in the country where they live is <relay price> a month — both are the prices the hosts list today, before tax. The domain is once a year, at the price the registrar shows at checkout."
 
 ## §1 Hosting account
 
-Why, said to them: "We need a computer abroad that runs around the clock. We'll rent it from DigitalOcean — it's like web hosting, except you get the whole server. Six dollars a month."
+Why, said to them: "We need a computer abroad that runs around the clock. We'll rent it from DigitalOcean — it's like web hosting, except you get the whole server. <price> a month before tax — the price we just went over."
 
 The steps, one at a time: "Open cloud.digitalocean.com/registrations/new." → "Sign up with an email and a password, or with Google." → "Confirm the email — there's a letter with a link." → "Add a payment method."
 

@@ -68,7 +68,11 @@ In the same message ask, in their words (wording: `lang/<xx>.md` §0):
 - **"Do you want your phone to tell you when something breaks?"** Yes / no.
 - **[relay]** one more, after the answer that picked the profile: **"Can a small server be rented in the country where they live — by you, or by someone there with a local card?"** If not, the relay is impossible; fall back to `single` and say why in one sentence.
 
-**Right after the answers, state the cost** — one paragraph, no request for confirmation (`lang/<xx>.md` §0, per profile): about $6 a month for the server abroad, about $10 a year for the domain, **[relay]** plus a small domestic server, typically $4–8 a month on a flat-rate plan (metered clouds can cost more for a household that watches video).
+**Right after the answers, state the cost** — one paragraph, no request for confirmation (`lang/<xx>.md` §0, per profile): the monthly price the host lists today for the server abroad, said as "before tax"; the domain, at the price the registrar shows at checkout; **[relay]** plus a small domestic server, at the price that host lists (a flat-rate plan; metered clouds can cost more for a household that watches video). Never quote a server price from memory or from these files — hosts change prices, add tax and differ by region, and this money goes on the person's card. Where the number comes from:
+
+- **DigitalOcean, and a token is already in `DO_TOKEN`:** `python3 scripts/provision-do.py price --size s-1vcpu-1gb` prints the listed monthly price, in dollars with cents; say that number, "a month, before tax".
+- **DigitalOcean, no token yet** (the usual case — the key comes in §2): ask the person to open https://www.digitalocean.com/pricing/droplets and read out the monthly price of the 1 GB / 1 CPU Basic droplet; repeat it, "before tax". When the key arrives, `price` confirms it (step 1).
+- **Any other host, and the relay's host:** the person reads the monthly price off the host's page for the plan they will take; repeat it, "before tax".
 
 If the session runs on a schedule and there is nobody to ask — **do not start**. Creating servers costs money and cannot be undone.
 
@@ -84,6 +88,14 @@ python3 scripts/provision-do.py check
 ```
 
 The script answers in Russian: `статус: active` is what you want; `аккаунт не активен` means the card is not attached — say so in words and go back to §1; do not try to create a machine. The first line, `аккаунт: <email>`, is the address to use for `--email` in the next step.
+
+Then, before anything is created, confirm the price you quoted:
+
+```bash
+python3 scripts/provision-do.py price --size s-1vcpu-1gb     # DigitalOcean's listed monthly price, before tax
+```
+
+If it differs from what you said at the cost step, say the new number now, "before tax", in one sentence. Use this number for the handout's `{price_exit}` / `--price-exit` (step 8).
 
 **Say out loud, once and not in passing:** the key passes through this conversation, so at the end you will revoke it together. Remind them again when you say goodbye.
 
@@ -214,8 +226,11 @@ By §9 — subscribing to alerts. Check immediately that they arrive: send a tes
 Build and hand over the handout, in the person's language:
 
 ```bash
-python3 scripts/make-handout.py --params params.json --out pamyatka.md     # Russian: the tested wording
+python3 scripts/make-handout.py --params params.json --out pamyatka.md \
+    --price-exit '<the price quoted at setup>' [--price-relay '<the relay's quoted price>']     # Russian: the tested wording
 ```
+
+`--price-exit` (in the template, `{price_exit}`) is the monthly price you quoted and confirmed in step 1 — the host's listed price, before tax; it has no default. **[relay]** Pass the relay's quoted price as `--price-relay` / `{price_relay}` too.
 
 Any other language: render `references/lang/handout-<xx>.md` from `params.json` into `handout.md` (the English template exists; the rules are at the top of the file). Same content, same sections, same variables as the script.
 
@@ -250,7 +265,7 @@ Both profiles end at the same scripts. What differs:
 | Drill (`vpn-drill.sh`) | not installed; nothing to fail over to | `--check` at once; full run with consent; monthly by timer |
 | First device | any network | phone on mobile data first, then the bypass, then everyone else |
 | `client-link.py` (`vless://`) | the normal path for Hiddify / v2rayNG users | the operator's spare entrance past the relay |
-| Whose traffic quota | the exit's (1 TB on the $6 droplet) | the exit's **and** the relay's — everything passes twice |
+| Whose traffic quota | the exit's (1 TB a month on the s-1vcpu-1gb droplet) | the exit's **and** the relay's — everything passes twice |
 
 ## Iron rules
 
@@ -286,7 +301,7 @@ It is their question number one, even when they do not ask it. Especially when t
 | `references/troubleshooting.md` | failure diagnosis, top down |
 | `scripts/gen-secrets.py` | keys and passwords for a new install |
 | `scripts/build-installers.py` | builds the self-contained `setup-*.sh` |
-| `scripts/provision-do.py` | `check`, `new-key`, `create`, `dns`, `ns-check`, `dns-check`, `list`, `destroy` |
+| `scripts/provision-do.py` | `check`, `price`, `new-key`, `create`, `dns`, `ns-check`, `dns-check`, `list`, `destroy` |
 | `scripts/make-handout.py` | the Russian handout |
 | `scripts/client-link.py` | `vless://` link for the apps |
 | `scripts/payload/common/verify.sh` | install check; on the server it is `vpn-verify.sh` |

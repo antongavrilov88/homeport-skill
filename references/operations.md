@@ -171,7 +171,7 @@ sudo wg show wg-clients transfer     # per device, since the interface came up
 ```
 
 The panel shows 14 days of history. Estimate the monthly usage: above 800 GB on a
-1 TB quota, it is time either to move to the $12 droplet or to find out who is downloading.
+1 TB quota, it is time either to move to the next size up (2 TB) or to find out who is downloading.
 
 Once a month it is worth looking through the full `provision-do.py list` output:
 check that no stray machines have appeared.
