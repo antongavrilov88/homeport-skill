@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- docs(skill): the "Upgrading from Burrow" note names the error an old install shows after an update (`Plugin burrow not found in marketplace burrow`), so people recognise it. Checked on a real Burrow 0.4.0 install: `marketplace update burrow` leads to exactly that error, and the three upgrade commands install `homeport@homeport` 0.5.0.
 - fix(landing): the comparison's free column is no longer half empty. The paid column had been carrying the chat mockup and five fine-print paragraphs — content that compares nothing — making it 1186px against the free column's 582px and leaving 739px of void inside the free card. Those now sit in their own row beneath the comparison; both columns are 691px.
 - feat(landing): hero rebuilt. The two offers were living inside the hero's left column at 352px wide while a 348px panel floated vertically centred against a 935px column, anchored to nothing. The headline row is now a top-aligned pair and the offers are a full-width row of 530px cards below it.
 - fix(landing): columns actually line up. The hero cards' label, amount, heading, body and button now share a baseline grid, and all four comparison rows align across both columns with the columns themselves equal height — previously the free column was 542px against the paid column's 1333px. The reservations are released below 760px, where the cards stack and alignment is meaningless.

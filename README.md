@@ -95,7 +95,7 @@ Then, in any session: *"set up my own VPN"*, *"VPN for my parents"*, *"подн�
 
 ### Upgrading from Burrow
 
-Homeport was formerly Burrow. If you installed it under the old name, remove that install and add the new one.
+Homeport was formerly Burrow. If you installed it under the old name, remove that install and add the new one. You'll know you're on the old install if Claude Code shows `Plugin burrow not found in marketplace burrow` after an update — the old plugin name no longer exists.
 
 **Plugin install.** Type these in Claude Code's prompt, one at a time:
 
