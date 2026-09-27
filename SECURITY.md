@@ -4,4 +4,10 @@ Homeport has no backend, no accounts and no telemetry. The only secrets are the 
 
 **Never commit `params.json` or the `out/` directory** — they are in `.gitignore` for that reason. If you paste a hosting API token into a chat, revoke it when the setup is done; the skill reminds you to.
 
-To report a vulnerability in the scripts or installers, open a GitHub issue with the label `security`, or message [@bepatientlikeme](https://t.me/bepatientlikeme) if it shouldn't be public yet.
+## Reporting a vulnerability
+
+Report vulnerabilities in the skill, the scripts or the installers privately: open the **Security** tab of this repository and choose **Report a vulnerability** ([direct link](https://github.com/antongavrilov88/homeport-skill/security/advisories/new)). The report stays between you and the maintainer until an advisory is published. Don't open a public issue for it.
+
+Bugs that aren't sensitive go to [issues](https://github.com/antongavrilov88/homeport-skill/issues). Never paste `params.json`, tokens, keys or server addresses into an issue.
+
+Vulnerabilities in the website (the landing page) are reported in the [site repository](https://github.com/antongavrilov88/homeport/security/advisories/new).
