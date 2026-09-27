@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Fails when a country-specific term is back in the public surface.
+# Fails when a country-specific term is back in the public surface,
+# or when the old product name "Burrow" is (second check below).
 # The list and the approved vocabulary live in CONTRIBUTING.md ("Wording rules").
 # Case-insensitive, Latin and Cyrillic. Language labels ("the panel is in Russian",
 # lang/ru.md) are allowed on purpose: only geographic / positioning uses are banned.
@@ -15,6 +16,25 @@ HITS=$(grep -rniE "$PATTERN" \
 if [ -n "$HITS" ]; then
   echo "banned wording found (see CONTRIBUTING.md, Wording rules):"
   echo "$HITS"
+  exit 1
+fi
+
+# Old name. The product was renamed Burrow -> Homeport; the word may stay only
+# where it tells the rename story. Whole word, case-insensitive. Also excluded:
+# CHANGELOG.md (history). Each allowed line must contain one of the extended
+# regexes below; everything else fails.
+OLD_NAME_ALLOWED='formerly Burrow
+Upgrading from Burrow
+marketplace remove burrow
+~/\.claude/skills/burrow
+\.claude-plugin/(plugin|marketplace)\.json:[0-9]+: *"burrow"$'
+OLD_HITS=$(grep -rniw 'burrow' \
+  --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \
+  --exclude='wording-guard.sh' --exclude='CONTRIBUTING.md' --exclude='CHANGELOG.md' \
+  "${1:-.}" | grep -vE -e "$OLD_NAME_ALLOWED" || true)
+if [ -n "$OLD_HITS" ]; then
+  echo "old product name found; say Homeport (see CONTRIBUTING.md, Wording rules):"
+  echo "$OLD_HITS"
   exit 1
 fi
 echo "wording guard: 0 hits"
