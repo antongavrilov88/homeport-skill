@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- docs(repo): the maintainer's personal Telegram channel is no longer a support or security contact. `SECURITY.md` sends vulnerabilities to GitHub's private vulnerability reporting (Security → Report a vulnerability) and non-sensitive bugs to issues; it had pointed private reports at a channel, which can't take private messages. The issue chooser's contact links go to existing issues and to the private report page instead of Telegram, and the README's "Stuck?" line points to issues. The About section keeps LinkedIn only. The waitlist bot link is unchanged.
 - docs(skill): the README's "Privacy, stated plainly" now lists what leaves the server: device DNS to Cloudflare's 1.1.1.1; every alert's title and text to a random topic on public ntfy.sh with no login, always, alongside your own ntfy; iPhone wake-ups through ntfy.sh with a message ID only; the watchdog's probe, certificate renewal and install-time downloads, which carry no user data. "Nothing phones home to anyone but your own ntfy" and "public ntfy.sh as fallback" are gone — both were wrong since 0.1.0. `references/human-steps.md` §9 and `references/troubleshooting.md` describe the public topic as always on, not a backup. Nothing the server sends has changed.
 
 Website changes live in the site repo's changelog: https://github.com/antongavrilov88/homeport/blob/main/CHANGELOG.md

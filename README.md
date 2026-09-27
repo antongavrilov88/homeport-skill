@@ -253,13 +253,13 @@ Internally the scripts still call themselves `vpn-kit` (`/opt/vpn-kit`, `/root/v
 
 ## Stuck? Want it done for you?
 
-The skill and this guide are free and stay free. If you get stuck, open an issue or message me on Telegram: [@bepatientlikeme](https://t.me/bepatientlikeme).
+The skill and this guide are free and stay free. If you get stuck, [open an issue](https://github.com/antongavrilov88/homeport-skill/issues) — remove tokens, keys and server addresses from anything you paste. Security problems go through [private reporting](SECURITY.md), not an issue.
 
 If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Homeport. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only, panel buttons in Russian. The server stays yours; I never hold your card or your account.
 
 ## Who's behind this
 
-I'm Anton Gavrilov, a frontend engineer. I built this for my parents, then for a friend, then wrote it down so Claude could do it for anyone. Built in public: [Telegram (RU)](https://t.me/bepatientlikeme) · [LinkedIn](https://linkedin.com/in/agavrilov88).
+I'm Anton Gavrilov, a frontend engineer. I built this for my parents, then for a friend, then wrote it down so Claude could do it for anyone. Built in public: [LinkedIn](https://linkedin.com/in/agavrilov88).
 
 ## License
 
