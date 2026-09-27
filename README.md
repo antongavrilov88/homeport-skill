@@ -19,7 +19,7 @@ The server is yours. The domain is yours. The keys never leave your machine. The
 - **A web panel** (reachable only from inside the VPN): who is online, how much they used, add or remove a device with a QR code, and on two servers manage the list of domains that bypass the tunnel.
 - **A watchdog** that checks the tunnel every 30 seconds, restarts what it can and pushes a notification to your phone. On two servers (the `relay` profile) it also moves everyone to the direct route and back, and a monthly fire drill (a deliberate two-minute outage) proves that failover actually works, not just "is configured". One server has nothing to fail over to, so it has no failover and no drill.
 - **Split routing, on two servers only** (the `relay` profile). Apps that refuse VPN connections — banks, government sites — go direct from the home-country relay; everything else goes through the tunnel. Optional per-country GeoIP rule. On one server everything goes through the server.
-- **Push notifications** through your own [ntfy](https://ntfy.sh) instance on the same server (public ntfy.sh as fallback).
+- **Push notifications** through your own [ntfy](https://ntfy.sh) instance on the same server, and every alert is also posted to a random topic on public ntfy.sh (see [Privacy, stated plainly](#privacy-stated-plainly)).
 - **A one-page handout** for the person who will actually use it, in plain words and in their language, generated at the end.
 
 ### Two profiles, one question
@@ -184,13 +184,22 @@ Everything is installed by a self-contained `setup-exit.sh` / `setup-relay.sh` t
 | `vpn-split` (`relay` only) | Rebuilds routing rules from `/etc/vpn-monitor/direct-domains.txt` |
 | `vpn-verify.sh`, `vpn-diag.sh` | Install verification and top-down diagnostics |
 
-Config lives in `/etc/vpn-monitor/` and `/etc/wireguard/`; state in `/var/lib/vpn-monitor/`. Nothing phones home to anyone but your own ntfy.
+Config lives in `/etc/vpn-monitor/` and `/etc/wireguard/`; state in `/var/lib/vpn-monitor/`. What the server sends out is listed under [Privacy, stated plainly](#privacy-stated-plainly).
 
 **Languages.** The skill talks to you in whatever language you write in, and the handout comes in that language. The web panel and the push notifications are in Russian in this version — the files that land on the server are frozen while the installers stay byte-identical to the tested ones. The skill tells you this before the first device, and the handout lists what each button and each notification means.
 
 ### Privacy, stated plainly
 
 Collected: byte counters and last-handshake time per device. That's it. Not collected: domains, destination IPs, DNS queries, content. Xray access logs are disabled on both machines; the panel listens only on the VPN interface and localhost. You'll see that your mother's phone used 2 GB and you will not see what she watched — even if you wanted to, the data isn't there.
+
+What leaves the server:
+
+- **Device DNS goes to Cloudflare's 1.1.1.1.** Device configs point DNS at `1.1.1.1` (`client_dns` in `params.json`), so Cloudflare sees the names your devices look up, arriving from your server.
+- **Every alert's title and text go to public ntfy.sh, always.** The watchdog posts each alert to your own ntfy *and* to a random topic on `ntfy.sh` (`ntfy_public_topic`, `vpn-` plus 16 hex characters) — every time, not only when your own ntfy is down. That topic has no login: anyone who knows its name can read it. The alerts are status messages (tunnel down, back up, drill result); the "tunnel restored" one also lists the devices' VPN-internal addresses.
+- **iPhone wake-ups go through ntfy.sh with a message ID only.** iOS can't be woken by your own ntfy, so your ntfy hands `ntfy.sh` a message ID under a hashed topic name — no title, no text. The phone then fetches the alert from your server.
+- **Connections that carry none of your data.** The watchdog's reachability probe (`www.gstatic.com/generate_204`, `cloudflare.com/cdn-cgi/trace`, every 30 seconds), Let's Encrypt certificate renewal, and at install time Ubuntu packages, Xray and ntfy downloads from GitHub, and `api.ipify.org` to learn the server's own address.
+
+Everything else stays on your server.
 
 ---
 

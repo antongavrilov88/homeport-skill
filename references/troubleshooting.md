@@ -123,13 +123,15 @@ sudo python3 -c "import importlib.util;s=importlib.util.spec_from_file_location(
 `False` → look at `/etc/vpn-monitor/alerts.json`. The watchdog tries each target
 three ways (through the tunnel, directly, and via the WireGuard interface) — if
 none of them got through, check the ntfy token and that `https://push.<domain>` opens at all.
-The public topic on `ntfy.sh` is the backup channel; it must always work.
+Every alert is also posted, every time, to the public topic on `ntfy.sh`
+(`ntfy_public_topic`, no login) — it is a second channel that is always on, not one
+used only when yours fails. If the test still returns `False`, `ntfy.sh` is unreachable too.
 
 **The message is in the app, but the phone never woke up (iPhone).** iOS keeps no
 background connection to a self-hosted ntfy, so the phone only sees the alert once
 you open the app by hand. The server has to hand the wake-up to `ntfy.sh`:
 `/etc/ntfy/server.yml` needs `upstream-base-url: "https://ntfy.sh"` (only the bare
-fact that a message exists travels there — no text, no topic; the phone then fetches
+fact that a message exists travels there — a message ID under a hashed topic name, no text; the phone then fetches
 the text from your server). Installers since this release write that line themselves;
 on a server built earlier, add it by hand and `systemctl restart ntfy`. Then **delete
 the subscription in the app and add it again** — without that the phone never
