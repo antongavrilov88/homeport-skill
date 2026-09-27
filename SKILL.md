@@ -273,7 +273,7 @@ Both profiles end at the same scripts. What differs:
 2. **Never touch machines without the right tag.** The account may hold other projects. `destroy` demands both the id and the tag and refuses on its own if they do not match.
 3. **Never delete the old machine before the new one works**, and never leave it "for a day, just in case". Verified the new one — remove the old one in the same operation.
 4. **The WireGuard port on the relay must not change** once people are connected: any change means a visit to every device.
-5. **The REALITY private key lives only on the exit.** It goes into no chat, no project, no relay installer — the build step strips it out together with the operator's spare entrance. Verify:
+5. **The REALITY private key goes into no chat, no project, no relay installer.** It exists in `params.json`, inside `out/setup-exit.sh` — and so in the exit's cloud-init metadata (step 3) — and on the exit itself, nowhere else; the build step strips it out of the relay installer together with the operator's spare entrance. Verify:
    `bash -c 'S=$(grep -n "^base64 -d" out/setup-relay.sh|cut -d: -f1); E=$(grep -n "^__VPNKIT_PAYLOAD__$" out/setup-relay.sh|cut -d: -f1); sed -n "$((S+1)),$((E-1))p" out/setup-relay.sh|base64 -d|tar xzO vars.sh|grep REALITY_PRIVATE'`
    The expected output is exactly `REALITY_PRIVATE=''` — an empty value. Anything after the `=` means the build is wrong; stop.
 6. **The cover site never impersonates someone else's company, shop or review site.** The cover must be real and the person's own. The template in `scripts/payload/site/` is a stub to be rewritten, not something to pass off as somebody's business.
