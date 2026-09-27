@@ -5,12 +5,12 @@
 # Case-insensitive, Latin and Cyrillic. Language labels ("the panel is in Russian",
 # lang/ru.md) are allowed on purpose: only geographic / positioning uses are banned.
 # Excluded from the scan: this script and CONTRIBUTING.md (they quote the list),
-# .git, images.
+# .git (the directory, or the pointer file in a worktree), images.
 set -u
 export LC_ALL=C.UTF-8
 PATTERN='\bRKN\b|Roskomnadzor|Роскомнадзор|Sberbank|Сбербанк|\bСбер\b|обход блокировок|белы[йе] спис|whitelist|Russian (sites?|exit|banks?|IPs?|address(es)?|cards?|hosting|hosters?|providers?|laws?|carriers?|networks?|users?|households?)|VPN for Russians|works in Russia|\bin Russia\b|\bРосси[яию]|российск|\bРФ\b'
 HITS=$(grep -rniE "$PATTERN" \
-  --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \
+  --exclude-dir=.git --exclude='.git' --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \
   --exclude='wording-guard.sh' --exclude='CONTRIBUTING.md' \
   "${1:-.}" || true)
 if [ -n "$HITS" ]; then
@@ -29,7 +29,7 @@ marketplace remove burrow
 ~/\.claude/skills/burrow
 \.claude-plugin/(plugin|marketplace)\.json:[0-9]+: *"burrow"$'
 OLD_HITS=$(grep -rniw 'burrow' \
-  --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \
+  --exclude-dir=.git --exclude='.git' --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \
   --exclude='wording-guard.sh' --exclude='CONTRIBUTING.md' --exclude='CHANGELOG.md' \
   "${1:-.}" | grep -vE -e "$OLD_NAME_ALLOWED" || true)
 if [ -n "$OLD_HITS" ]; then
