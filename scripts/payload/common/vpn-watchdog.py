@@ -106,11 +106,11 @@ def nft_set(members):
 
 
 def persist_set(members=None):
-    """Отразить набор в файле, чтобы он пережил перезагрузку.
+    """Mirror the set into the file so it survives a reboot.
 
-    Во время отката в файле сознательно остаётся состав «до аварии»: иначе
-    перезагрузка в этот момент стёрла бы его насовсем и клиенты никогда бы
-    не вернулись на туннель.
+    During a failover the file deliberately keeps the pre-outage members:
+    otherwise a reboot at that moment would wipe them for good and the clients
+    would never return to the tunnel.
     """
     path = "/etc/xray/xray-tproxy.nft"
     try:
@@ -191,7 +191,7 @@ def main_single():
         if alive:
             if warned:
                 warned = False
-                notify("VPN: сервер снова отвечает", "Проверка через Xray проходит, всё в порядке.")
+                notify("VPN: server responding again", "The probe through Xray passes, all good.")
             fails = 0
             write_state(tunnel="ok", failover=False, fallback_ok=True, single=True)
             time.sleep(PERIOD_OK)
@@ -204,12 +204,12 @@ def main_single():
             write_state(last_repair=int(time.time()))
         if fails == FAIL_TO_FAILOVER and not warned:
             warned = True
-            notify("VPN: сервер не отвечает",
-                   "Проба через Xray не проходит около минуты. Перезапустил Xray, продолжаю следить. "
-                   "Если не поднимется — скорее всего забанили IP, нужна новая машина.", "urgent")
+            notify("VPN: server not responding",
+                   "The probe through Xray has failed for about a minute. Restarted Xray, still watching. "
+                   "If it does not come back, the IP is most likely blocked and a new server is needed.", "urgent")
         if fails > FAIL_TO_FAILOVER and fails % (3600 // PERIOD_DOWN) == 0:
-            notify("VPN: сервер всё ещё не отвечает",
-                   "Прошло около часа. Автоматический перезапуск не помогает.", "high")
+            notify("VPN: server still not responding",
+                   "About an hour has passed. Automatic restarts are not helping.", "high")
         if fails % REPAIR_EVERY == 0:
             sh("systemctl restart xray", 60)
             write_state(last_repair=int(time.time()))
@@ -217,7 +217,7 @@ def main_single():
 
 
 def resume_after_reboot():
-    """После перезагрузки во время отката вернуть клиентов, если туннель жив."""
+    """After a reboot during a failover, bring the clients back if the tunnel is alive."""
     try:
         saved = json.load(open(SAVED))
     except Exception:
@@ -228,9 +228,9 @@ def resume_after_reboot():
         nft_set(saved)
         persist_set()
         write_state(tunnel="ok", failover=False, restored_at=int(time.time()))
-        notify("VPN: клиенты возвращены на туннель",
-               "После перезагрузки набор был пуст, а туннель работает — "
-               "восстановил состав из сохранённого списка (%s)." % ", ".join(saved))
+        notify("VPN: clients moved back to the tunnel",
+               "After a reboot the set was empty while the tunnel works — "
+               "restored it from the saved list (%s)." % ", ".join(saved))
 
 
 def main():
@@ -253,13 +253,13 @@ def main():
             write_state(fallback_ok=fallback_ok, fallback_checked_at=now)
             if not fallback_ok and not fallback_warned:
                 fallback_warned = True
-                notify("VPN: запасной путь не отвечает",
-                       "Туннель сейчас работает, но WireGuard-резерв мёртв — если основной "
-                       "путь упадёт, переключаться будет некуда. Нужно посмотреть вручную.", "high")
+                notify("VPN: fallback route not responding",
+                       "The tunnel works right now, but the WireGuard fallback is dead — if the "
+                       "tunnel fails, there is nowhere to switch to. Needs a manual look.", "high")
             elif fallback_ok and fallback_warned:
                 fallback_warned = False
-                notify("VPN: запасной путь снова живой",
-                       "WireGuard-резерв отвечает, автооткат снова возможен.")
+                notify("VPN: fallback route alive again",
+                       "The WireGuard fallback responds, automatic failover is possible again.")
 
         alive = probe_tunnel()
 
@@ -286,7 +286,7 @@ def main():
                 if fails >= FAIL_TO_FAILOVER:
                     # users first: move everyone to WireGuard before touching anything else
                     members = nft_members()
-                    if members:                       # не затирать сохранённый список пустым
+                    if members:                       # never overwrite the saved list with an empty one
                         json.dump(members, open(SAVED, "w"))
                     else:
                         try:
@@ -294,7 +294,7 @@ def main():
                         except Exception:
                             members = []
                     nft_set([])
-                    persist_set(members)              # в файле остаётся состав «до аварии»
+                    persist_set(members)              # the file keeps the pre-outage members
                     status = "failover"
                     down_probes = 0
                     oks = 0
@@ -302,10 +302,10 @@ def main():
                     fb = probe_fallback()
                     write_state(tunnel="down", failover=True, saved=members,
                                 failover_at=now, fallback_ok=fb, flaps=len(flaps))
-                    notify("VPN: туннель упал, все переведены на запасной путь",
-                           "REALITY до DigitalOcean не отвечал около минуты. Клиенты уже работают "
-                           "через WireGuard%s. Теперь чиню основной канал и верну обратно сам."
-                           % ("" if fb else " — но и он сейчас не отвечает, это плохо"),
+                    notify("VPN: tunnel down, everyone moved to the fallback route",
+                           "REALITY to the exit server did not respond for about a minute. Clients are "
+                           "already on WireGuard%s. Now repairing the tunnel; clients go back automatically."
+                           % ("" if fb else " — but it is not responding either, which is bad"),
                            "urgent" if not fb else "high")
                     # only now start repairing
                     sh("systemctl restart xray", 60)
@@ -329,9 +329,9 @@ def main():
                     status = "ok"
                     fails = 0
                     write_state(tunnel="ok", failover=False, restored_at=int(time.time()))
-                    notify("VPN: туннель восстановился",
-                           "Связь с DigitalOcean стабильна, клиенты вернулись на быстрый путь (%s)."
-                           % (", ".join(members) or "список был пуст"))
+                    notify("VPN: tunnel restored",
+                           "The link to the exit server is stable, clients are back on the fast route (%s)."
+                           % (", ".join(members) or "the list was empty"))
                     time.sleep(PERIOD_OK)
                     continue
                 time.sleep(PERIOD_DOWN)
@@ -346,15 +346,15 @@ def main():
                 if down_probes == REPAIR_EVERY:
                     rc, path = sh("/usr/local/sbin/vpn-diag.sh", 120)
                     write_state(diag=path.strip())
-                    notify("VPN: собран снимок состояния",
-                           "Канал лежит больше пяти минут, автоматический ремонт не помогает. "
-                           "Диагностика сохранена в %s — с ней можно разбираться." % path.strip(),
+                    notify("VPN: diagnostic snapshot saved",
+                           "The tunnel has been down for over five minutes and automatic repair is not helping. "
+                           "Diagnostics saved to %s for a closer look." % path.strip(),
                            "high")
                 mins = down_probes * PERIOD_DOWN // 60
                 if mins and mins % 60 == 0 and down_probes % (3600 // PERIOD_DOWN) == 0:
-                    notify("VPN: основной канал всё ещё лежит",
-                           "Прошло %d ч. Клиенты работают через WireGuard, попытки починки "
-                           "продолжаются." % (mins // 60), "high")
+                    notify("VPN: tunnel still down",
+                           "%d h so far. Clients are on WireGuard, repair attempts continue."
+                           % (mins // 60), "high")
                 time.sleep(PERIOD_DOWN)
 
 

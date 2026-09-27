@@ -106,7 +106,7 @@ if not, ask who should be put back.
 - Open it only from inside the VPN, at `http://<subnet>.1:8088`. It does not exist
   from the outside — that is by design.
 - `systemctl status vpn-monitor`, `journalctl -u vpn-monitor -n 30`.
-- `нужен код администратора` ("admin code required") → the code is in `/etc/vpn-monitor/admin-token`.
+- `admin code required` (`нужен код администратора` on a server installed before 0.6.0) → the code is in `/etc/vpn-monitor/admin-token`.
 
 ## An existing client's config cannot be downloaded
 
@@ -117,7 +117,7 @@ out: issue a new client and delete the old one.
 ## Notifications are not arriving
 
 ```bash
-sudo python3 -c "import importlib.util;s=importlib.util.spec_from_file_location('w','/usr/local/sbin/vpn-watchdog.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);print(m.notify('Тест','Проверка'))"
+sudo python3 -c "import importlib.util;s=importlib.util.spec_from_file_location('w','/usr/local/sbin/vpn-watchdog.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);print(m.notify('VPN: test','Checking the alert channel.'))"
 ```
 
 `False` → look at `/etc/vpn-monitor/alerts.json`. The watchdog tries each target

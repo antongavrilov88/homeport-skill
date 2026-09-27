@@ -2,7 +2,7 @@
 
 **Your own VPN on a server you rent: your own address, not one shared with thousands of strangers.**
 
-Homeport is a free [Claude](https://claude.ai) skill that turns a $6 cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel (buttons in Russian for now), and you add phones and laptops by scanning a QR code.
+Homeport is a free [Claude](https://claude.ai) skill that turns a $6 cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel in English, and you add phones and laptops by scanning a QR code.
 
 How long it takes: your clicks, then about 10 minutes while it installs. A new domain takes 15 minutes to a few hours to go live, and a new hosting account is sometimes reviewed for a few hours.
 
@@ -186,7 +186,7 @@ Everything is installed by a self-contained `setup-exit.sh` / `setup-relay.sh` t
 
 Config lives in `/etc/vpn-monitor/` and `/etc/wireguard/`; state in `/var/lib/vpn-monitor/`. What the server sends out is listed under [Privacy, stated plainly](#privacy-stated-plainly).
 
-**Languages.** The skill talks to you in whatever language you write in, and the handout comes in that language. The web panel and the push notifications are in Russian in this version — the files that land on the server are frozen while the installers stay byte-identical to the tested ones. The skill tells you this before the first device, and the handout lists what each button and each notification means.
+**Languages.** The skill talks to you in whatever language you write in, and the handout comes in that language. The web panel and all push notifications are in English. Still in Russian in this version: what the installers print and the cover-site template. A server installed before 0.6.0 keeps its Russian panel and notifications until you switch it (`references/operations.md`).
 
 ### Privacy, stated plainly
 
@@ -255,7 +255,7 @@ Internally the scripts still call themselves `vpn-kit` (`/opt/vpn-kit`, `/root/v
 
 The skill and this guide are free and stay free. If you get stuck, [open an issue](https://github.com/antongavrilov88/homeport-skill/issues) — remove tokens, keys and server addresses from anything you paste. Security problems go through [private reporting](SECURITY.md), not an issue.
 
-If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Homeport. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only, panel buttons in Russian. The server stays yours; I never hold your card or your account.
+If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Homeport. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only. The server stays yours; I never hold your card or your account.
 
 ## Who's behind this
 
