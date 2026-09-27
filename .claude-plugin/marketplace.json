@@ -1,15 +1,15 @@
 {
-  "name": "burrow",
+  "name": "homeport",
   "owner": {
     "name": "Anton Gavrilov",
     "url": "https://github.com/antongavrilov88"
   },
   "metadata": {
-    "description": "Burrow: your own VPN on a server you rent, set up by Claude."
+    "description": "Homeport: your own VPN on a server you rent, set up by Claude."
   },
   "plugins": [
     {
-      "name": "burrow",
+      "name": "homeport",
       "description": "Your own VPN on a server you rent, set up by Claude: VLESS + XHTTP + REALITY plus WireGuard, a web panel with QR enrolment, a watchdog that restarts what fails (automatic failover on the two-server layout). Two profiles (single server abroad, or relay + exit), chosen by one plain-language question.",
       "source": "./",
       "version": "0.4.0",
@@ -17,8 +17,8 @@
         "name": "Anton Gavrilov",
         "url": "https://github.com/antongavrilov88"
       },
-      "homepage": "https://antongavrilov88.github.io/burrow/",
-      "repository": "https://github.com/antongavrilov88/burrow-skill",
+      "homepage": "https://antongavrilov88.github.io/homeport/",
+      "repository": "https://github.com/antongavrilov88/homeport-skill",
       "license": "MIT",
       "category": "productivity",
       "keywords": [
@@ -27,7 +27,8 @@
         "xray",
         "reality",
         "self-hosted",
-        "digitalocean"
+        "digitalocean",
+        "burrow"
       ]
     }
   ]

@@ -1,12 +1,12 @@
-# Burrow
+# Homeport
 
 **Your own VPN on a server you rent: your own address, not one shared with thousands of strangers.**
 
-Burrow is a free [Claude](https://claude.ai) skill that turns a $6 cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel (buttons in Russian for now), and you add phones and laptops by scanning a QR code.
+Homeport is a free [Claude](https://claude.ai) skill that turns a $6 cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel (buttons in Russian for now), and you add phones and laptops by scanning a QR code.
 
 How long it takes: your clicks, then about 10 minutes while it installs. A new domain takes 15 minutes to a few hours to go live, and a new hosting account is sometimes reviewed for a few hours.
 
-The server is yours. The domain is yours. The keys never leave your machine. There is no Burrow account, no Burrow backend, and nothing for anyone to shut down except your own server — which you can rebuild.
+The server is yours. The domain is yours. The keys never leave your machine. There is no Homeport account, no Homeport backend, and nothing for anyone to shut down except your own server — which you can rebuild.
 
 > Made for one situation: people you care about live where the internet is filtered, and every "install our app" VPN keeps dying. Works in both directions — reaching services back home from abroad, or reaching the world from behind a filter.
 
@@ -55,7 +55,7 @@ Whichever way you run it, two things are yours to bring: **a hosting account wit
 | **Claude Code** on a laptop with SSH — the recommended way | Everything: creates the server, sets DNS, installs, verifies, fixes, writes the handout. | Create the hosting account, add the card, buy the domain, paste one token. |
 | **claude.ai** (a paid plan with code execution on; the skill uploaded as a zip) | Guidance plus file generation: it makes the keys and the installers, explains every step, reads back the output you paste. **It cannot connect to your server or to the hosting API** — the sandbox has no network to them. It says so at the start; if it seems to hang waiting for a connection, that is the sandbox, not a bug. | Everything that needs a connection: create the server in the provider's console with the installer pasted in, run the two SSH lines it gives you, check DNS at dnschecker.org. |
 | **Cowork** (the desktop app) | **Untested.** It should behave like Claude Code when it has a terminal with network access; nobody has run a full setup through it yet. If you do, open an issue and say how it went. | |
-| **None of the above** | The hosted agent does the same setup in a chat, for one price — [burrow site](https://antongavrilov88.github.io/burrow/). | Account, card, invite. |
+| **None of the above** | The hosted agent does the same setup in a chat, for one price — [Homeport site](https://antongavrilov88.github.io/homeport/). | Account, card, invite. |
 
 ---
 
@@ -64,40 +64,86 @@ Whichever way you run it, two things are yours to bring: **a hosting account wit
 **Claude Code — install it as a plugin.** Type these in Claude Code's prompt, one at a time:
 
 ```
-/plugin marketplace add antongavrilov88/burrow-skill
+/plugin marketplace add antongavrilov88/homeport-skill
 ```
 
 ```
-/plugin install burrow@burrow
+/plugin install homeport@homeport
 ```
 
-From a shell instead, the same thing is `claude plugin marketplace add antongavrilov88/burrow-skill` and then `claude plugin install burrow@burrow`. Pasting `/plugin …` into a shell fails with "no such file or directory".
+From a shell instead, the same thing is `claude plugin marketplace add antongavrilov88/homeport-skill` and then `claude plugin install homeport@homeport`. Pasting `/plugin …` into a shell fails with "no such file or directory".
 
 To update later, refresh the catalog, update the plugin, and restart Claude Code. The first command alone only refreshes the catalog:
 
 ```bash
-claude plugin marketplace update burrow
+claude plugin marketplace update homeport
 ```
 
 ```bash
-claude plugin update burrow@burrow
+claude plugin update homeport@homeport
 ```
 
-**Claude Code — or copy the skill** (update with `git -C ~/.claude/skills/burrow pull`):
+**Claude Code — or copy the skill** (update with `git -C ~/.claude/skills/homeport pull`):
 
 ```bash
-git clone https://github.com/antongavrilov88/burrow-skill ~/.claude/skills/burrow
+git clone https://github.com/antongavrilov88/homeport-skill ~/.claude/skills/homeport
 ```
 
-Then, in any session: *"set up my own VPN"*, *"VPN for my parents"*, *"подними мне VPN"*, or `/burrow` (`/burrow:burrow` when installed as a plugin).
+Then, in any session: *"set up my own VPN"*, *"VPN for my parents"*, *"подними мне VPN"*, or `/homeport` (`/homeport:homeport` when installed as a plugin).
 
-**claude.ai:** download `burrow-skill.zip` from the [latest release](https://github.com/antongavrilov88/burrow-skill/releases), then Settings → Capabilities → Skills → Upload skill. Start a chat and say what you want. Read the claude.ai row in the table above first: Claude will explain each step and you will run the commands.
+**claude.ai:** download `homeport-skill.zip` from the [latest release](https://github.com/antongavrilov88/homeport-skill/releases), then Settings → Capabilities → Skills → Upload skill. Start a chat and say what you want. Read the claude.ai row in the table above first: Claude will explain each step and you will run the commands.
+
+### Upgrading from Burrow
+
+Homeport was formerly Burrow. If you installed it under the old name, remove that install and add the new one.
+
+**Plugin install.** Type these in Claude Code's prompt, one at a time:
+
+```
+/plugin marketplace remove burrow
+```
+
+```
+/plugin marketplace add antongavrilov88/homeport-skill
+```
+
+```
+/plugin install homeport@homeport
+```
+
+From a shell instead, the same three steps are:
+
+```bash
+claude plugin marketplace remove burrow
+```
+
+```bash
+claude plugin marketplace add antongavrilov88/homeport-skill
+```
+
+```bash
+claude plugin install homeport@homeport
+```
+
+Then restart Claude Code.
+
+**Copied skill:**
+
+```bash
+rm -rf ~/.claude/skills/burrow
+```
+
+```bash
+git clone https://github.com/antongavrilov88/homeport-skill ~/.claude/skills/homeport
+```
+
+The old repository URL keeps redirecting, but the old plugin and folder names no longer receive updates.
 
 ---
 
 ## What you will do yourself
 
-The skill does everything it technically can. These four things it can't, because they need your card, your email or your phone in hand — and by design Burrow never does them for you:
+The skill does everything it technically can. These four things it can't, because they need your card, your email or your phone in hand — and by design Homeport never does them for you:
 
 1. **Create a hosting account** and attach a payment method. DigitalOcean (`$6/month`, 1 TB traffic) is the automated path; any Ubuntu 24.04 VPS works with a few more clicks on your side — [Hetzner](references/providers/hetzner.md), [Vultr](references/providers/vultr.md), [anything else](references/providers/generic-ubuntu.md). No card that works? [`references/provisioning.md`](references/provisioning.md) has a dated list of hosts that take crypto or regional cards.
 2. **Give Claude an API token** for that account (so it can create the server instead of dictating twenty clicks), and revoke it afterwards. The skill reminds you.
@@ -178,7 +224,7 @@ scripts/
   client-link.py             vless:// link for Hiddify / v2rayNG
   make-handout.py            the Russian handout (tested wording)
   payload/                   what actually lands on the servers (see table above)
-skills/burrow/SKILL.md       the plugin entry point: points at the root SKILL.md
+skills/homeport/SKILL.md     the plugin entry point: points at the root SKILL.md
 .claude-plugin/              marketplace.json and plugin.json for /plugin install
 ```
 
@@ -200,7 +246,7 @@ Internally the scripts still call themselves `vpn-kit` (`/opt/vpn-kit`, `/root/v
 
 The skill and this guide are free and stay free. If you get stuck, open an issue or message me on Telegram: [@bepatientlikeme](https://t.me/bepatientlikeme).
 
-If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Burrow. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [burrow site](https://antongavrilov88.github.io/burrow/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only, panel buttons in Russian. The server stays yours; I never hold your card or your account.
+If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Homeport. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only, panel buttons in Russian. The server stays yours; I never hold your card or your account.
 
 ## Who's behind this
 
