@@ -227,7 +227,7 @@ class H(BaseHTTPRequestHandler):
             return True
         if self.headers.get("X-Admin-Token", "") == tok:
             return True
-        self._send(403, json.dumps({"error": "нужен код администратора"}, ensure_ascii=False).encode())
+        self._send(403, json.dumps({"error": "admin code required"}, ensure_ascii=False).encode())
         return False
 
     def do_POST(self):
@@ -253,7 +253,7 @@ class H(BaseHTTPRequestHandler):
             port = ALT_PORT if str(req.get("port")) == str(ALT_PORT) else WG_PORT
             route = "reality" if req.get("route") == "reality" else "wg"
             if not name:
-                return self._send(400, json.dumps({"error": "имя: буквы, цифры, пробел, дефис (до 40)"},
+                return self._send(400, json.dumps({"error": "name: letters, digits, spaces, hyphens (up to 40)"},
                                                   ensure_ascii=False).encode())
             return self._send(200, json.dumps(create_client(name, port, route), ensure_ascii=False).encode())
 
@@ -360,11 +360,11 @@ def existing_names():
 def create_client(name, port, route):
     dup = existing_names().get(name.strip().lower())
     if dup:
-        return {"error": f"клиент «{dup}» уже есть — придумай другое имя "
-                         f"(или удали старого, если это замена устройства)"}
+        return {"error": f"client “{dup}” already exists — pick another name "
+                         f"(or delete the old one if this replaces a device)"}
     ip = free_ip()
     if not ip:
-        return {"error": "свободных адресов не осталось"}
+        return {"error": "no free addresses left"}
     sl = slug(name)
     base = os.path.join(WGDIR, sl)
     if os.path.exists(base + ".conf"):
@@ -373,7 +373,7 @@ def create_client(name, port, route):
     priv = sh("wg genkey").strip()
     pub = subprocess.run(["wg", "pubkey"], input=priv.encode(), capture_output=True, timeout=10).stdout.decode().strip()
     if not priv or not pub:
-        return {"error": "не удалось сгенерировать ключи"}
+        return {"error": "could not generate keys"}
     cfg = client_config(priv, ip, port)
     old = os.umask(0o077)
     try:
@@ -413,14 +413,14 @@ def get_config(ip, port=None):
                 continue
             base = os.path.join(WGDIR, f[:-7])
             if not os.path.exists(base + ".private"):
-                return {"error": "приватный ключ этого клиента на сервере не хранится — "
-                                 "конфиг создавали не здесь. Можно только выпустить новый."}
+                return {"error": "this client's private key is not stored on the server — "
+                                 "the config was made elsewhere. You can only issue a new one."}
             priv = open(base + ".private").read().strip()
             cfg = client_config(priv, ip, port or WG_PORT)
             return {"ok": True, "ip": ip, "file": f[:-7] + ".conf", "config": cfg, "qr": qr_png(cfg)}
-        return {"error": "приватный ключ этого клиента на сервере не хранится — "
-                         "конфиг создавали не здесь. Можно только выпустить новый."}
-    return {"error": "нет такого клиента"}
+        return {"error": "this client's private key is not stored on the server — "
+                         "the config was made elsewhere. You can only issue a new one."}
+    return {"error": "no such client"}
 
 
 def delete_client(ip):
@@ -451,7 +451,7 @@ def delete_client(ip):
                     except Exception:
                         pass
             return {"ok": True, "ip": ip}
-    return {"error": "нет такого клиента"}
+    return {"error": "no such client"}
 
 
 def persist_set():

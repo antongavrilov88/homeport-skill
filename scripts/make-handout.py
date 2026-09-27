@@ -21,8 +21,8 @@ T = """# Твой VPN — памятка
 1. Подключись к VPN с любого устройства, которое уже настроено.
 2. Открой в браузере **{dash}**
 3. Если спросит код — введи **{token}**
-4. Нажми **+ Новый клиент**, напиши имя (например «Телефон мамы»), нажми
-   **Создать и показать QR**.
+4. Нажми **+ New client**, напиши имя (например «Телефон мамы»), нажми
+   **Create and show QR**.
 5. На новом устройстве открой приложение **WireGuard** и отсканируй QR-код.
 
 Приложение WireGuard бесплатное, есть везде: App Store, Google Play, а для
@@ -106,7 +106,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--params", required=True)
     ap.add_argument("--out", default="pamyatka.md")
-    ap.add_argument("--price-exit", default="$6")
+    ap.add_argument("--price-exit", required=True,
+                    help="the exit's monthly price quoted at setup (the host's listed price); no default: hosts change prices")
     ap.add_argument("--price-relay", default="")
     a = ap.parse_args()
     p = json.load(open(a.params, encoding="utf-8"))

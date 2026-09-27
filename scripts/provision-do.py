@@ -5,6 +5,7 @@
 
     python3 provision-do.py check
     python3 provision-do.py keys
+    python3 provision-do.py price [--size s-1vcpu-1gb]
     python3 provision-do.py new-key --name vpn-kit --out ~/.ssh/vpn-kit
     python3 provision-do.py create --name vpn-exit --user-data setup-exit.sh --tag vpn-exit \
                                    --ssh-key 12345678 [--region fra1] [--size s-1vcpu-1gb]
@@ -60,6 +61,29 @@ def cmd_list(a):
     for d in call("GET", "/droplets" + q).get("droplets", []):
         ip = next((n["ip_address"] for n in d["networks"]["v4"] if n["type"] == "public"), "")
         print(f'{d["id"]}\t{d["name"]}\t{d["status"]}\t{ip}\t{d["size_slug"]}\t{",".join(d.get("tags", []))}')
+
+
+def cmd_price(a):
+    """Print DigitalOcean's listed monthly price for a droplet size, before tax.
+
+    The number the person hears at the cost step comes from here, not from the docs:
+    hosts change prices. The API lists sizes only with a token.
+    """
+    if not os.environ.get("DO_TOKEN", "").strip():
+        sys.exit("price needs a DigitalOcean token in DO_TOKEN: the API lists sizes only with one. "
+                 "Until the person has a token, read the price off "
+                 "https://www.digitalocean.com/pricing/droplets instead.")
+    path = "/sizes?per_page=200"
+    while path:
+        page = call("GET", path)
+        for s in page.get("sizes", []):
+            if s.get("slug") == a.size:
+                print(f'${float(s["price_monthly"]):.2f}')
+                return
+        nxt = page.get("links", {}).get("pages", {}).get("next", "")
+        # Follow only links back to the API: the token must not go anywhere else.
+        path = nxt[len(API):] if nxt.startswith(API + "/") else ""
+    sys.exit(f"DigitalOcean does not list the size {a.size}")
 
 
 def cmd_create(a):
@@ -264,6 +288,10 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("check").set_defaults(fn=cmd_check)
     sub.add_parser("keys").set_defaults(fn=cmd_keys)
+
+    pr = sub.add_parser("price", help="listed monthly price of a droplet size, before tax")
+    pr.set_defaults(fn=cmd_price)
+    pr.add_argument("--size", default="s-1vcpu-1gb")
 
     nk = sub.add_parser("new-key"); nk.set_defaults(fn=cmd_new_key)
     nk.add_argument("--name", default="vpn-kit")

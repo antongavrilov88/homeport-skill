@@ -123,11 +123,11 @@ ssh root@ADDRESS 'bash /root/setup-relay.sh'
 
 **The first device** cannot come from the panel — the panel is reachable only from inside the VPN. You issue it from the server's shell (`operations.md`, "Issue a device from the shell") and send the QR image as a file; the person scans it from the screen. When you have no shell to the server, the person runs that call themselves and `qrencode -t ansiutf8 < /root/device.conf` shows the QR in their terminal, or they reach the panel through `ssh -L 8088:127.0.0.1:8088 root@<IP>` and `http://127.0.0.1:8088`. Every later device: the person, in the panel, from a device that is already connected. People who are not in the room get a screenshot of the QR or the `.conf` over a messenger; the message is deleted once scanned.
 
-**The panel:** opened from a device that is already on the VPN, at `http://<wg_subnet>.1:<dashboard_port>` (default `http://10.67.0.1:8088`); the admin code is asked once per browser. **Its labels are Russian** — the glossary is in `lang/<xx>.md`; for a person who does not read Russian, say so once before this step.
+**The panel:** opened from a device that is already on the VPN, at `http://<wg_subnet>.1:<dashboard_port>` (default `http://10.67.0.1:8088`); the admin code is asked once per browser. **Its labels are English** — the glossary is in `lang/<xx>.md`; for a person who does not read English, say so once before this step and name each button as it is written.
 
 **[relay] Order:** the first device is a phone on mobile data with Wi-Fi off → "does youtube open?" → switch the bypass on for that device → the same question → only then QR codes for everyone else. Phones on strict operators: port 443. The two warnings (high UDP ports; what failover looks like) are in `lang/<xx>.md` §8.
 
-**You verify:** "does youtube open?" from them; `sudo wg show wg-clients` on the server shows a fresh handshake for the new peer. [relay] After the bypass: the device's address is in the `proxied_src` set and the panel shows it as «туннель».
+**You verify:** "does youtube open?" from them; `sudo wg show wg-clients` on the server shows a fresh handshake for the new peer. [relay] After the bypass: the device's address is in the `proxied_src` set and the panel shows it as **tunnel**.
 
 ---
 
@@ -135,7 +135,7 @@ ssh root@ADDRESS 'bash /root/setup-relay.sh'
 
 **What happens:** the **ntfy** app → **+** → **Subscribe to topic** → **Use another server** on → `https://push.<domain>` → topic, login, password from `params.json` (`ntfy_topic`, `ntfy_user`, `ntfy_pass`).
 
-**You verify:** send a test from the server (the one-liner in `operations.md`) and ask whether it arrived. If the self-hosted ntfy did not come up, the public fallback topic on ntfy.sh still works (`ntfy_public_topic`); say which one they are subscribed to.
+**You verify:** send a test from the server (the one-liner in `operations.md`) and ask whether it arrived. Every alert goes to two places at once, always: the self-hosted ntfy and a public topic on ntfy.sh (`ntfy_public_topic`, no login). If the self-hosted ntfy did not come up, the public topic is the only one that works; say which one they are subscribed to.
 
 ---
 

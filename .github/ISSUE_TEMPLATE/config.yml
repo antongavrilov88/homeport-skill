@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Stuck mid-setup? Message me
-    url: https://t.me/bepatientlikeme
-    about: Faster than an issue for "it broke at step 4" — no logs with secrets in a public tracker.
+  - name: Stuck mid-setup? Check existing issues
+    url: https://github.com/antongavrilov88/homeport-skill/issues?q=is%3Aissue
+    about: Someone may have hit the same step. If not, open a Bug — and remove tokens, keys and server addresses from the logs first.
+  - name: Report a security vulnerability
+    url: https://github.com/antongavrilov88/homeport-skill/security/advisories/new
+    about: Private report to the maintainer. Don't open a public issue for vulnerabilities.

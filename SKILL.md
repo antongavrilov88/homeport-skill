@@ -13,7 +13,7 @@ You are setting up a personal VPN on a server the person rents, and you hand ove
 - Ready-made wording for every human-facing moment is in `references/lang/en.md` and `references/lang/ru.md`, keyed by the same section numbers as `references/human-steps.md`. The Russian file is the wording tested with real families: use it verbatim. For any other language, translate from the English file as you go — the meaning and the warnings, never new steps.
 - The handout at the end: Russian → `scripts/make-handout.py` (its built-in text is the tested one). Any other language → fill `references/lang/handout-<xx>.md` yourself from `params.json` (`en` exists; the variables and the rules are at the top of the template).
 - The scripts print their console messages in Russian too (same reason). Where a line matters, it is quoted below; otherwise the exit code is your signal.
-- Not translated in this version: **the web panel and the push notifications are in Russian**, because the files that land on the server are frozen. For a person who does not read Russian, say so once, plainly, before the first device ("the panel's buttons are in Russian for now; the handout says what each one means"), and the handout carries the glossary from `lang/<xx>.md`. The panel is opened a few times a year; the VPN itself needs no panel.
+- **The web panel and all push notifications (watchdog and drill) are in English**, whatever language the person speaks; name the buttons in English and explain them in the person's language. One exception: a server installed before 0.6.0 keeps the Russian panel and notifications until it is switched (`references/operations.md`, "Switch an existing server's panel to English"). The panel is opened a few times a year; the VPN itself needs no panel.
 
 ## Where you are running
 
@@ -68,7 +68,11 @@ In the same message ask, in their words (wording: `lang/<xx>.md` §0):
 - **"Do you want your phone to tell you when something breaks?"** Yes / no.
 - **[relay]** one more, after the answer that picked the profile: **"Can a small server be rented in the country where they live — by you, or by someone there with a local card?"** If not, the relay is impossible; fall back to `single` and say why in one sentence.
 
-**Right after the answers, state the cost** — one paragraph, no request for confirmation (`lang/<xx>.md` §0, per profile): about $6 a month for the server abroad, about $10 a year for the domain, **[relay]** plus a small domestic server, typically $4–8 a month on a flat-rate plan (metered clouds can cost more for a household that watches video).
+**Right after the answers, state the cost** — one paragraph, no request for confirmation (`lang/<xx>.md` §0, per profile): the monthly price the host lists today for the server abroad, said as "before tax"; the domain, at the price the registrar shows at checkout; **[relay]** plus a small domestic server, at the price that host lists (a flat-rate plan; metered clouds can cost more for a household that watches video). Never quote a server price from memory or from these files — hosts change prices, add tax and differ by region, and this money goes on the person's card. Where the number comes from:
+
+- **DigitalOcean, and a token is already in `DO_TOKEN`:** `python3 scripts/provision-do.py price --size s-1vcpu-1gb` prints the listed monthly price, in dollars with cents; say that number, "a month, before tax".
+- **DigitalOcean, no token yet** (the usual case — the key comes in §2): ask the person to open https://www.digitalocean.com/pricing/droplets and read out the monthly price of the 1 GB / 1 CPU Basic droplet; repeat it, "before tax". When the key arrives, `price` confirms it (step 1).
+- **Any other host, and the relay's host:** the person reads the monthly price off the host's page for the plan they will take; repeat it, "before tax".
 
 If the session runs on a schedule and there is nobody to ask — **do not start**. Creating servers costs money and cannot be undone.
 
@@ -84,6 +88,14 @@ python3 scripts/provision-do.py check
 ```
 
 The script answers in Russian: `статус: active` is what you want; `аккаунт не активен` means the card is not attached — say so in words and go back to §1; do not try to create a machine. The first line, `аккаунт: <email>`, is the address to use for `--email` in the next step.
+
+Then, before anything is created, confirm the price you quoted:
+
+```bash
+python3 scripts/provision-do.py price --size s-1vcpu-1gb     # DigitalOcean's listed monthly price, before tax
+```
+
+If it differs from what you said at the cost step, say the new number now, "before tax", in one sentence. Use this number for the handout's `{price_exit}` / `--price-exit` (step 8).
 
 **Say out loud, once and not in passing:** the key passes through this conversation, so at the end you will revoke it together. Remind them again when you say goodbye.
 
@@ -195,14 +207,14 @@ Add devices **with the person, in the panel** — not for them. They have to wal
 
 Guidance-only mode (no shell to the server from where you run): the person runs that one-liner themselves over SSH, then `qrencode -t ansiutf8 < /root/device.conf` prints the QR in their terminal and the phone scans it from the screen; or they open the panel through their own port-forward, `ssh -L 8088:127.0.0.1:8088 root@<IP>` and `http://127.0.0.1:8088` in their browser, and create the device there like any later one.
 
-From the second device on, by §8: the person opens the panel from the device that is already connected → «+ Новый клиент» ("New client") → the new device scans the QR. Wait for "it works" before counting the step done. Ask directly: "Open youtube.com — does it open?" People who are not in the room get a screenshot of the QR or the `.conf` file over a messenger the person trusts — say that the file is a key and the message should be deleted once scanned.
+From the second device on, by §8: the person opens the panel from the device that is already connected → **+ New client** → the new device scans the QR. Wait for "it works" before counting the step done. Ask directly: "Open youtube.com — does it open?" People who are not in the room get a screenshot of the QR or the `.conf` file over a messenger the person trusts — say that the file is a key and the message should be deleted once scanned.
 
 **[relay]** The order matters here:
 
 1. The first device is a phone **on mobile data, Wi-Fi off**, on the users' side. Connect; "does youtube open?" — that is the direct route through the relay.
-2. Then switch the bypass on for that one device (the route switch on its row in the panel, or `«через туннель»` / "through the tunnel" when creating it) and ask the same question again.
+2. Then switch the bypass on for that one device (the route switch on its row in the panel, or **Route: through the tunnel** when creating it) and ask the same question again.
 3. **Only after that hand out QR codes to anyone else.** Verify from a phone on mobile data first — a relay that only works over home Wi-Fi is not verified.
-4. **If Wi-Fi works and mobile data does not**, deal with it before anything else, in this order: re-issue that device on `alt_port` 443 («443 (для строгих сетей)») and test on mobile data again; if it still will not connect, the relay's own address is not getting through that network, and the fix is a **different provider in the users' country**, not another setting. This is why the test comes before the QR codes: the relay's IP is written into every config the panel issues, so moving the relay later means re-issuing every device.
+4. **If Wi-Fi works and mobile data does not**, deal with it before anything else, in this order: re-issue that device on `alt_port` 443 (**443 (strict networks)**) and test on mobile data again; if it still will not connect, the relay's own address is not getting through that network, and the fix is a **different provider in the users' country**, not another setting. This is why the test comes before the QR codes: the relay's IP is written into every config the panel issues, so moving the relay later means re-issuing every device.
 5. Two warnings the person needs now, not after the first incident (`lang/<xx>.md` §8): mobile operators sometimes cut UDP on high ports — issue phones on port 443 when in doubt; and if their operator starts dropping the tunnel, the watchdog moves everyone to the direct route within a minute or two — the internet keeps working, without the bypass — and moves them back when the tunnel returns. "The VPN is on but sites don't open" is that state, not a broken system.
 
 A spare entrance past the relay for the operator, if they are technical and want one: `python3 scripts/client-link.py --params params.json --label home`. In `single` this link is the normal way for Hiddify / v2rayNG users; an ordinary person does not need it either way — do not load them with it.
@@ -214,8 +226,11 @@ By §9 — subscribing to alerts. Check immediately that they arrive: send a tes
 Build and hand over the handout, in the person's language:
 
 ```bash
-python3 scripts/make-handout.py --params params.json --out pamyatka.md     # Russian: the tested wording
+python3 scripts/make-handout.py --params params.json --out pamyatka.md \
+    --price-exit '<the price quoted at setup>' [--price-relay '<the relay's quoted price>']     # Russian: the tested wording
 ```
+
+`--price-exit` (in the template, `{price_exit}`) is the monthly price you quoted and confirmed in step 1 — the host's listed price, before tax; it has no default. **[relay]** Pass the relay's quoted price as `--price-relay` / `{price_relay}` too.
 
 Any other language: render `references/lang/handout-<xx>.md` from `params.json` into `handout.md` (the English template exists; the rules are at the top of the file). Same content, same sections, same variables as the script.
 
@@ -250,7 +265,7 @@ Both profiles end at the same scripts. What differs:
 | Drill (`vpn-drill.sh`) | not installed; nothing to fail over to | `--check` at once; full run with consent; monthly by timer |
 | First device | any network | phone on mobile data first, then the bypass, then everyone else |
 | `client-link.py` (`vless://`) | the normal path for Hiddify / v2rayNG users | the operator's spare entrance past the relay |
-| Whose traffic quota | the exit's (1 TB on the $6 droplet) | the exit's **and** the relay's — everything passes twice |
+| Whose traffic quota | the exit's (1 TB a month on the s-1vcpu-1gb droplet) | the exit's **and** the relay's — everything passes twice |
 
 ## Iron rules
 
@@ -286,7 +301,7 @@ It is their question number one, even when they do not ask it. Especially when t
 | `references/troubleshooting.md` | failure diagnosis, top down |
 | `scripts/gen-secrets.py` | keys and passwords for a new install |
 | `scripts/build-installers.py` | builds the self-contained `setup-*.sh` |
-| `scripts/provision-do.py` | `check`, `new-key`, `create`, `dns`, `ns-check`, `dns-check`, `list`, `destroy` |
+| `scripts/provision-do.py` | `check`, `price`, `new-key`, `create`, `dns`, `ns-check`, `dns-check`, `list`, `destroy` |
 | `scripts/make-handout.py` | the Russian handout |
 | `scripts/client-link.py` | `vless://` link for the apps |
 | `scripts/payload/common/verify.sh` | install check; on the server it is `vpn-verify.sh` |

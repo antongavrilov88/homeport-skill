@@ -30,7 +30,7 @@ Provider is a parameter of each layer, not of the profile: any Ubuntu 24.04 host
 
 In the order worth trying:
 
-1. **Someone abroad pays.** A friend or relative with a working card rents the exit in *their* account — about $6 a month, the price of a coffee. Then it is the standard flow with their token, and they revoke it at the end like anyone else. Never register an account in someone else's name; this is their account, used with their knowledge.
+1. **Someone abroad pays.** A friend or relative with a working card rents the exit in *their* account, at the host's listed monthly price. Then it is the standard flow with their token, and they revoke it at the end like anyone else. Never register an account in someone else's name; this is their account, used with their knowledge.
 2. **Providers that take crypto or regional payment methods.** All exit-only; none tested by this skill yet.
    - **Vultr** — cards, PayPal, Alipay, WeChat Pay, cryptocurrency. Mainstream, many locations.
    - **Hostinger (VPS)** — cards, PayPal, cryptocurrency through a payment processor; locations in Europe, the US and Asia.

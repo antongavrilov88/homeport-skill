@@ -2,7 +2,7 @@
 
 **Your own VPN on a server you rent: your own address, not one shared with thousands of strangers.**
 
-Homeport is a free [Claude](https://claude.ai) skill that turns a $6 cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel (buttons in Russian for now), and you add phones and laptops by scanning a QR code.
+Homeport is a free [Claude](https://claude.ai) skill that turns a cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel in English, and you add phones and laptops by scanning a QR code.
 
 How long it takes: your clicks, then about 10 minutes while it installs. A new domain takes 15 minutes to a few hours to go live, and a new hosting account is sometimes reviewed for a few hours.
 
@@ -19,7 +19,7 @@ The server is yours. The domain is yours. The keys never leave your machine. The
 - **A web panel** (reachable only from inside the VPN): who is online, how much they used, add or remove a device with a QR code, and on two servers manage the list of domains that bypass the tunnel.
 - **A watchdog** that checks the tunnel every 30 seconds, restarts what it can and pushes a notification to your phone. On two servers (the `relay` profile) it also moves everyone to the direct route and back, and a monthly fire drill (a deliberate two-minute outage) proves that failover actually works, not just "is configured". One server has nothing to fail over to, so it has no failover and no drill.
 - **Split routing, on two servers only** (the `relay` profile). Apps that refuse VPN connections — banks, government sites — go direct from the home-country relay; everything else goes through the tunnel. Optional per-country GeoIP rule. On one server everything goes through the server.
-- **Push notifications** through your own [ntfy](https://ntfy.sh) instance on the same server (public ntfy.sh as fallback).
+- **Push notifications** through your own [ntfy](https://ntfy.sh) instance on the same server, and every alert is also posted to a random topic on public ntfy.sh (see [Privacy, stated plainly](#privacy-stated-plainly)).
 - **A one-page handout** for the person who will actually use it, in plain words and in their language, generated at the end.
 
 ### Two profiles, one question
@@ -145,14 +145,14 @@ The old repository URL keeps redirecting, but the old plugin and folder names no
 
 The skill does everything it technically can. These four things it can't, because they need your card, your email or your phone in hand — and by design Homeport never does them for you:
 
-1. **Create a hosting account** and attach a payment method. DigitalOcean (`$6/month`, 1 TB traffic) is the automated path; any Ubuntu 24.04 VPS works with a few more clicks on your side — [Hetzner](references/providers/hetzner.md), [Vultr](references/providers/vultr.md), [anything else](references/providers/generic-ubuntu.md). No card that works? [`references/provisioning.md`](references/provisioning.md) has a dated list of hosts that take crypto or regional cards.
+1. **Create a hosting account** and attach a payment method. DigitalOcean (the s-1vcpu-1gb droplet, 1 TB traffic a month) is the automated path; any Ubuntu 24.04 VPS works with a few more clicks on your side — [Hetzner](references/providers/hetzner.md), [Vultr](references/providers/vultr.md), [anything else](references/providers/generic-ubuntu.md). No card that works? [`references/provisioning.md`](references/provisioning.md) has a dated list of hosts that take crypto or regional cards.
 2. **Give Claude an API token** for that account (so it can create the server instead of dictating twenty clicks), and revoke it afterwards. The skill reminds you.
 3. **Buy a domain** — any cheap, neutral name you don't care about. It is the cover story, and a domain can get banned along with the IP.
 4. **Point the domain** at the server: either delegate it to DigitalOcean nameservers or add three A-records by hand. Step-by-step instructions for the common registrars are built in.
 
 For the `relay` profile you also rent a small VPS in the home country and paste one command into a terminal; the skill walks you through that too, including "the password won't show while you type".
 
-Budget: about **$6–7/month** for `single`, plus a domain (~$10/year); `relay` adds a ~$4–8/month VPS.
+Budget: a small server (DigitalOcean listed the size the skill creates at $6/month before tax on 27 Sep 2026) plus a domain; `relay` adds a small VPS in the home country. Your host and registrar set the prices; the skill tells you the host's listed price before it creates anything.
 
 ---
 
@@ -184,13 +184,22 @@ Everything is installed by a self-contained `setup-exit.sh` / `setup-relay.sh` t
 | `vpn-split` (`relay` only) | Rebuilds routing rules from `/etc/vpn-monitor/direct-domains.txt` |
 | `vpn-verify.sh`, `vpn-diag.sh` | Install verification and top-down diagnostics |
 
-Config lives in `/etc/vpn-monitor/` and `/etc/wireguard/`; state in `/var/lib/vpn-monitor/`. Nothing phones home to anyone but your own ntfy.
+Config lives in `/etc/vpn-monitor/` and `/etc/wireguard/`; state in `/var/lib/vpn-monitor/`. What the server sends out is listed under [Privacy, stated plainly](#privacy-stated-plainly).
 
-**Languages.** The skill talks to you in whatever language you write in, and the handout comes in that language. The web panel and the push notifications are in Russian in this version — the files that land on the server are frozen while the installers stay byte-identical to the tested ones. The skill tells you this before the first device, and the handout lists what each button and each notification means.
+**Languages.** The skill talks to you in whatever language you write in, and the handout comes in that language. The web panel and all push notifications are in English. Still in Russian in this version: what the installers print and the cover-site template. A server installed before 0.6.0 keeps its Russian panel and notifications until you switch it (`references/operations.md`).
 
 ### Privacy, stated plainly
 
 Collected: byte counters and last-handshake time per device. That's it. Not collected: domains, destination IPs, DNS queries, content. Xray access logs are disabled on both machines; the panel listens only on the VPN interface and localhost. You'll see that your mother's phone used 2 GB and you will not see what she watched — even if you wanted to, the data isn't there.
+
+What leaves the server:
+
+- **Device DNS goes to Cloudflare's 1.1.1.1.** Device configs point DNS at `1.1.1.1` (`client_dns` in `params.json`), so Cloudflare sees the names your devices look up, arriving from your server.
+- **Every alert's title and text go to public ntfy.sh, always.** The watchdog posts each alert to your own ntfy *and* to a random topic on `ntfy.sh` (`ntfy_public_topic`, `vpn-` plus 16 hex characters) — every time, not only when your own ntfy is down. That topic has no login: anyone who knows its name can read it. The alerts are status messages (tunnel down, back up, drill result); the "tunnel restored" one also lists the devices' VPN-internal addresses.
+- **iPhone wake-ups go through ntfy.sh with a message ID only.** iOS can't be woken by your own ntfy, so your ntfy hands `ntfy.sh` a message ID under a hashed topic name — no title, no text. The phone then fetches the alert from your server.
+- **Connections that carry none of your data.** The watchdog's reachability probe (`www.gstatic.com/generate_204`, `cloudflare.com/cdn-cgi/trace`, every 30 seconds), Let's Encrypt certificate renewal, and at install time Ubuntu packages, Xray and ntfy downloads from GitHub, and `api.ipify.org` to learn the server's own address.
+
+Everything else stays on your server.
 
 ---
 
@@ -244,13 +253,13 @@ Internally the scripts still call themselves `vpn-kit` (`/opt/vpn-kit`, `/root/v
 
 ## Stuck? Want it done for you?
 
-The skill and this guide are free and stay free. If you get stuck, open an issue or message me on Telegram: [@bepatientlikeme](https://t.me/bepatientlikeme).
+The skill and this guide are free and stay free. If you get stuck, [open an issue](https://github.com/antongavrilov88/homeport-skill/issues) — remove tokens, keys and server addresses from anything you paste. Security problems go through [private reporting](SECURITY.md), not an issue.
 
-If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Homeport. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only, panel buttons in Russian. The server stays yours; I never hold your card or your account.
+If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Homeport. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only. The server stays yours; I never hold your card or your account.
 
 ## Who's behind this
 
-I'm Anton Gavrilov, a frontend engineer. I built this for my parents, then for a friend, then wrote it down so Claude could do it for anyone. Built in public: [Telegram (RU)](https://t.me/bepatientlikeme) · [LinkedIn](https://linkedin.com/in/agavrilov88).
+I'm Anton Gavrilov, a frontend engineer. I built this for my parents, then for a friend, then wrote it down so Claude could do it for anyone. Built in public: [LinkedIn](https://linkedin.com/in/agavrilov88).
 
 ## License
 

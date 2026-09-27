@@ -35,14 +35,14 @@ Notifications: "Do you want your phone to tell you if something breaks?"
 
 [relay] "Can a small server be rented in the country where they live — by you, or by someone there with a local card?"
 
-Money — one paragraph, no confirmation asked:
+Money — one paragraph, no confirmation asked. `<price>` is the monthly price the host lists today, never a number from memory: from `provision-do.py price` for DigitalOcean, otherwise read off the host's page by the person (`SKILL.md`, step 0). If you don't have it yet, ask for it first — DigitalOcean: "Open digitalocean.com/pricing/droplets and tell me the monthly price of the Basic server with 1 GB of memory and 1 CPU."; another host: "Open their prices page and tell me the monthly price of the plan we'll take."
 
-- `single`: "Here's what it comes to: a server abroad is about six dollars a month, the domain about ten dollars a year. All in, around seven dollars a month."
-- `relay`: "Here's what it comes to: a server abroad is about six dollars a month, the domain about ten dollars a year, and a small server in the country where they live, usually four to eight dollars a month on a flat-rate plan. All in, around twelve dollars a month."
+- `single`: "Here's what it comes to: the server abroad is <price> a month — that's the price the host lists today, before tax. The domain is once a year, at the price the registrar shows at checkout."
+- `relay`: "Here's what it comes to: the server abroad is <price> a month, and the small server in the country where they live is <relay price> a month — both are the prices the hosts list today, before tax. The domain is once a year, at the price the registrar shows at checkout."
 
 ## §1 Hosting account
 
-Why, said to them: "We need a computer abroad that runs around the clock. We'll rent it from DigitalOcean — it's like web hosting, except you get the whole server. Six dollars a month."
+Why, said to them: "We need a computer abroad that runs around the clock. We'll rent it from DigitalOcean — it's like web hosting, except you get the whole server. <price> a month before tax — the price we just went over."
 
 The steps, one at a time: "Open cloud.digitalocean.com/registrations/new." → "Sign up with an email and a password, or with Google." → "Confirm the email — there's a letter with a link." → "Add a payment method."
 
@@ -140,11 +140,11 @@ People who are not in the room: "Send them a screenshot of the QR, or the `.conf
 
 The check: "Open youtube.com — does it open?"
 
-The panel is in Russian for now — the buttons the person needs, with meanings (full glossary at the end of this file): «+ Новый клиент» — "New client"; «Создать и показать QR» — "Create and show the QR"; «Скачать .conf» — "Download .conf"; «Порт: 51821 (обычный) / 443 (для строгих сетей)» — "Port: 51821 (normal) / 443 (for strict networks)"; «Маршрут: через туннель / напрямую» — "Route: through the tunnel / direct". Say once, before the first device: "The panel's buttons are in Russian at the moment. I'll tell you which one to press, and the handout lists what each one means."
+The panel is in English. The buttons the person needs (full list at the end of this file): **+ New client**; **Create and show QR**; **Download .conf**; **Port: 51821 (standard) / 443 (strict networks)**; **Route: through the tunnel / direct** (relay only). For a person who does not read English, name each button exactly as it is written and say what it does in their language, once, before the first device.
 
 [relay] Before anyone else gets a QR: "Let's try the first phone on mobile data, with Wi-Fi off — that's the network that matters." Then: "Now I'll switch the bypass on for this phone. Same question: does YouTube open?"
 
-[relay] If Wi-Fi works and mobile data does not, fix that before anything else, in this order: re-issue this device on `alt_port` 443 («443 (для строгих сетей)» — "443 (for strict networks)") and try mobile data again; if it still will not connect, the relay's own address is not getting through that network, and the answer is a different provider in the users' country — not another setting. Do it now: the relay's IP is written into every config the panel issues, so moving the relay after the QR codes go out means re-issuing every device.
+[relay] If Wi-Fi works and mobile data does not, fix that before anything else, in this order: re-issue this device on `alt_port` 443 (**443 (strict networks)**) and try mobile data again; if it still will not connect, the relay's own address is not getting through that network, and the answer is a different provider in the users' country — not another setting. Do it now: the relay's IP is written into every config the panel issues, so moving the relay after the QR codes go out means re-issuing every device.
 
 [relay] The two warnings: "Some mobile operators cut this kind of connection on the usual port. If a phone won't connect on mobile data, we make it a 443 one — that goes through almost everywhere." And: "If their operator starts blocking the tunnel, everyone is moved to the direct route within a minute or two, automatically. The internet keeps working, just without the bypass, and they're moved back when it recovers. So 'the VPN is on but the sites don't open' means that, not that the whole thing is broken."
 
@@ -152,7 +152,7 @@ The panel is in Russian for now — the buttons the person needs, with meanings 
 
 "If something breaks, you'll be the first to know — not your parents. It takes a minute to set up."
 
-"Install the ntfy app. Tap +, 'Subscribe to topic', turn on 'Use another server' and enter the address I'll give you, then the topic name, the login and the password — also from me. The messages themselves are in Russian for now; the handout translates every title."
+"Install the ntfy app. Tap +, 'Subscribe to topic', turn on 'Use another server' and enter the address I'll give you, then the topic name, the login and the password — also from me. The messages are in English; the handout lists every title."
 
 Then: "I've just sent a test — did it arrive?"
 
@@ -173,43 +173,51 @@ Then: "I've just sent a test — did it arrive?"
 - Goodbye: what works and how to add a device (one line); revoke the key (the exact path); `params.json`: "This file is yours — it holds the keys without which repairs get much harder. Put it in a password manager or a cloud drive, then delete it from this chat."; the domain renewal reminder.
 - The day after: "Hi — is everything still working? Anything odd on any of the phones?"
 
-## Glossary: the panel (Russian labels → meaning)
+## Glossary: the panel (labels → meaning)
+
+The labels as the panel shows them, for explaining in the person's language. A server installed before 0.6.0 shows the old Russian labels until it is switched (`references/operations.md`).
 
 | On the panel | Meaning |
 |---|---|
-| «VPN — трафик» | VPN — traffic (the page title) |
-| «6 ч / 24 ч / 7 дней» | 6 h / 24 h / 7 days (the period) |
-| «Трафик по времени» | Traffic over time |
-| «Через туннель» / «Напрямую (резерв)» / «Трафик клиентов» | Through the tunnel / Direct (fallback) / Client traffic |
-| «Кто сколько прокачал» | Usage per device |
-| «Клиенты» · «Все / Онлайн / Туннель / Напрямую» · «поиск» | Devices · All / Online / Tunnel / Direct · search |
-| «Всех → туннель» / «Всех → напрямую» | Everyone → tunnel / Everyone → direct |
-| «+ Новый клиент» | + New client (add a device) |
-| «Имя» · «Маршрут: через туннель / напрямую» · «Порт: 51821 (обычный) / 443 (для строгих сетей)» | Name · Route: through the tunnel / direct · Port: 51821 (normal) / 443 (for strict networks) |
-| «Создать и показать QR» | Create and show the QR |
-| «Скачать .conf» / «Скопировать» / «Закрыть» | Download .conf / Copy / Close |
-| «Клиент / Маршрут / Активность / Вниз / Вверх / Всего» | Device / Route / Activity / Down / Up / Total (table headers) |
-| «онлайн» · «только что» · «N мин назад» · «никогда» | online · just now · N min ago · never |
-| «Исключения — идут напрямую с релея» · «Добавить» · «Убрать» | Exceptions — go direct from the relay · Add · Remove |
-| «Код администратора (спроси у того, кто ставил VPN):» | "Admin code (ask whoever set up the VPN):" — the one-time prompt |
-| «Туннель в порядке» | Tunnel OK |
-| «Туннель не отвечает» | Tunnel not responding (repair in progress) |
-| «Туннель лежит, все переведены на запасной путь» | Tunnel down, everyone on the fallback route |
-| «Связь вернулась, проверяю стабильность» | Back, checking stability |
-| «Сторож не запущен» | Watchdog not running |
+| VPN traffic | the page title |
+| 6 h / 24 h / 7 days | the period the charts cover |
+| Online now · of N · Nobody is connected. · N offline · last seen | who is connected at this moment |
+| Total for the period / Through the tunnel / Direct / Peak speed | the tiles (tunnel and direct: relay only) |
+| Traffic over time | the chart; Through the tunnel / Direct (fallback) on the relay, Client traffic on one server |
+| Usage per client | traffic per device for the period |
+| Clients · All / Online / Tunnel / Direct · search | the device list and its filters (Tunnel / Direct: relay only) |
+| All → tunnel / All → direct | move every device into the tunnel / onto the direct route (relay only) |
+| + New client | add a device |
+| Name · Route: through the tunnel / direct · Port: 51821 (standard) / 443 (strict networks) | the new-device form (Route: relay only) |
+| Create and show QR | create the device and show its QR code |
+| Download .conf / Copy / Close | the config dialog |
+| Client / Route / Activity / Down / Up / Total | the table headers |
+| online · just now · N min ago · N h ago · N d ago · never | last activity |
+| config · direct / → tunnel · × | a device's config, its route switch (relay only), delete it |
+| Exceptions — go direct from the relay · Add · Remove | domains that skip the tunnel (relay only) |
+| Admin code (ask whoever set up the VPN): | the one-time code prompt |
+| Tunnel OK | all good |
+| Tunnel not responding | repair in progress |
+| Tunnel down, everyone on the fallback route | failover happened (relay) |
+| Connection back, checking stability | about to move clients back |
+| Watchdog not running | automatic checks are off |
 
-## Glossary: push notifications (Russian titles → meaning)
+## Glossary: push notifications (titles → meaning)
 
 | Title | Meaning |
 |---|---|
-| «VPN: сервер не отвечает» | the server isn't responding (urgent) |
-| «VPN: сервер снова отвечает» | the server is responding again |
-| «VPN: сервер всё ещё не отвечает» | the server is still not responding (hourly reminder) |
-| «VPN: туннель упал, все переведены на запасной путь» | the tunnel is down, everyone moved to the fallback route |
-| «VPN: туннель восстановился» | the tunnel is back, clients moved back |
-| «VPN: запасной путь не отвечает» | the fallback route isn't responding — look at it |
-| «VPN: запасной путь снова живой» | the fallback route is alive again |
-| «VPN: основной канал всё ещё лежит» | the main channel is still down (hourly reminder) |
-| «VPN: собран снимок состояния» | a diagnostic snapshot was saved |
-| «VPN: клиенты возвращены на туннель» | clients moved back to the tunnel after a reboot |
-| «Готовность к учениям» / «Учения: всё сработало» / «Учения: есть замечания» / «Учения отменены» | ready for the drill / drill: all good / drill: needs a look / drill cancelled |
+| VPN: server not responding | the server isn't responding (urgent) |
+| VPN: server responding again | the server is responding again |
+| VPN: server still not responding | the server is still not responding (hourly reminder) |
+| VPN: tunnel down, everyone moved to the fallback route | the tunnel is down, everyone moved to the fallback route |
+| VPN: tunnel restored | the tunnel is back, clients moved back |
+| VPN: fallback route not responding | the fallback route isn't responding — look at it |
+| VPN: fallback route alive again | the fallback route is alive again |
+| VPN: tunnel still down | the tunnel is still down (hourly reminder) |
+| VPN: diagnostic snapshot saved | a diagnostic snapshot was saved |
+| VPN: clients moved back to the tunnel | clients moved back to the tunnel after a reboot |
+| VPN: ready for the drill | the weekly readiness check passed (relay only) |
+| VPN: drill passed | the monthly drill: failover and restore worked, clients restored exactly (relay only) |
+| VPN: drill needs a look | the monthly drill found a problem (urgent, relay only) |
+| VPN: drill postponed | people were online, the drill will try next time (relay only) |
+| VPN: drill cancelled | the drill did not start: tunnel, fallback route or watchdog not ready (relay only) |
