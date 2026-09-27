@@ -2,7 +2,7 @@
 
 **Your own VPN on a server you rent: your own address, not one shared with thousands of strangers.**
 
-Homeport is a free [Claude](https://claude.ai) skill that turns a cloud server you rent into a personal VPN. You create the server and buy a domain; Claude installs everything, hands you a web panel in English, and you add phones and laptops by scanning a QR code.
+Homeport is a free, open-source skill for AI coding agents: plain instructions plus standard-library Python and bash scripts that an agent follows to turn a small server you rent into a personal VPN. You open a hosting account and buy a domain; the agent creates the server on DigitalOcean, installs everything, hands you a web panel in English, and you add devices by scanning a QR code. Tested with Claude Code; other agents that load the open Agent Skills format haven't been tested yet.
 
 How long it takes: your clicks, then about 10 minutes while it installs. A new domain takes 15 minutes to a few hours to go live, and a new hosting account is sometimes reviewed for a few hours.
 
@@ -24,7 +24,7 @@ The server is yours. The domain is yours. The keys are made on your machine and 
 
 ### Two profiles, one question
 
-Claude asks one thing first: *"Where are the people who'll use this, and does their network restrict direct foreign connections or only allow listed IP ranges (typical on carrier-restricted mobile networks)?"* The answer picks the profile. You don't need to know what any of the below means.
+Your agent asks one thing first: *"Where are the people who'll use this, and does their network restrict direct foreign connections or only allow listed IP ranges (typical on carrier-restricted mobile networks)?"* The answer picks the profile. You don't need to know what any of the below means.
 
 **`single`** (the default) — one server abroad. You, or a few people, anywhere; devices connect straight to it. Simplest and cheapest.
 
@@ -46,16 +46,17 @@ Both profiles end at the same installers with different parameters; the table in
 
 ## Requirements
 
-Whichever way you run it, two things are yours to bring: **a hosting account with a payment method the provider accepts**, and **a domain** — any cheap, neutral name. Python 3 must exist wherever Claude runs the scripts; they are standard library only, including the X25519 key generation.
+Whichever way you run it, two things are yours to bring: **a hosting account with a payment method the provider accepts**, and **a domain** — any cheap, neutral name. Python 3 must exist wherever your agent runs the scripts; they are standard library only, including the X25519 key generation.
 
-*Where* you run the skill decides how much of the work Claude can do by itself:
+*Where* you run the skill decides how much of the work your agent can do by itself:
 
-| You run the skill in | What Claude does | What you do |
+| You run the skill in | What the agent does | What you do |
 |---|---|---|
-| **Claude Code** on a laptop with SSH — the recommended way | Everything: creates the server, sets DNS, installs, verifies, fixes, writes the handout. | Create the hosting account, add the card, buy the domain, paste one token. |
-| **claude.ai** (a paid plan with code execution on; the skill uploaded as a zip) | Guidance plus file generation: it makes the keys and the installers, explains every step, reads back the output you paste. **It cannot connect to your server or to the hosting API** — the sandbox has no network to them. It says so at the start; if it seems to hang waiting for a connection, that is the sandbox, not a bug. | Everything that needs a connection: create the server in the provider's console with the installer pasted in, run the two SSH lines it gives you, check DNS at dnschecker.org. |
+| **Claude Code** on a laptop with SSH — the recommended way | **Tested.** Everything: creates the server, sets DNS, installs, verifies, fixes, writes the handout. | Create the hosting account, add the card, buy the domain, paste one token. |
+| **claude.ai** (a paid plan with code execution on; the skill uploaded as a zip) | **Untested** until [homeport-skill#4](https://github.com/antongavrilov88/homeport-skill/issues/4) confirms the release zip installs there. Guidance plus file generation: it makes the keys and the installers, explains every step, reads back the output you paste. **It cannot connect to your server or to the hosting API** — the sandbox has no network to them. It says so at the start; if it seems to hang waiting for a connection, that is the sandbox, not a bug. | Everything that needs a connection: create the server in the provider's console with the installer pasted in, run the two SSH lines it gives you, check DNS at dnschecker.org. |
 | **Cowork** (the desktop app) | **Untested.** It should behave like Claude Code when it has a terminal with network access; nobody has run a full setup through it yet. If you do, open an issue and say how it went. | |
-| **None of the above** | The hosted agent does the same setup in a chat, for one price — [Homeport site](https://antongavrilov88.github.io/homeport/). | Account, card, invite. |
+| **Other agents with a shell and network** — Codex CLI, Gemini CLI, Cursor | **Untested.** They load the same open Agent Skills format and should behave like Claude Code; nobody has run a full setup through them yet. Clone the skill into your agent's skills folder (see [Quick start](#quick-start)); if you try one, open an issue and say how it went. | |
+| **None of the above** | Homeport's agent does the same setup in a chat, for one price — [Homeport site](https://antongavrilov88.github.io/homeport/). | Account, card, invite. |
 
 ---
 
@@ -92,6 +93,14 @@ git clone https://github.com/antongavrilov88/homeport-skill ~/.claude/skills/hom
 Then, in any session: *"set up my own VPN"*, *"VPN for my parents"*, *"подними мне VPN"*, or `/homeport` (`/homeport:homeport` when installed as a plugin).
 
 **claude.ai:** download `homeport-skill.zip` from the [latest release](https://github.com/antongavrilov88/homeport-skill/releases), then Settings → Capabilities → Skills → Upload skill. Start a chat and say what you want. Read the claude.ai row in the table above first: Claude will explain each step and you will run the commands.
+
+**Other agents (untested):** Codex CLI, Gemini CLI, Cursor and anything else that loads the open Agent Skills format. Clone the skill into your agent's skills folder — for Codex CLI that is `~/.agents/skills/homeport`:
+
+```bash
+git clone https://github.com/antongavrilov88/homeport-skill <your agent's skills folder>/homeport
+```
+
+Nobody has run a full setup through them yet. If you do, [open an issue](https://github.com/antongavrilov88/homeport-skill/issues) and say how it went.
 
 ### Upgrading from Burrow
 
@@ -146,7 +155,7 @@ The old repository URL keeps redirecting, but the old plugin and folder names no
 The skill does everything it technically can. These four things it can't, because they need your card, your email or your phone in hand — and by design Homeport never does them for you:
 
 1. **Create a hosting account** and attach a payment method. DigitalOcean (the s-1vcpu-1gb droplet, 1 TB traffic a month) is the automated path; any Ubuntu 24.04 VPS works with a few more clicks on your side — [Hetzner](references/providers/hetzner.md), [Vultr](references/providers/vultr.md), [anything else](references/providers/generic-ubuntu.md). No card that works? [`references/provisioning.md`](references/provisioning.md) has a dated list of hosts that take crypto or regional cards.
-2. **Give Claude an API token** for that account (so it can create the server instead of dictating twenty clicks), and revoke it afterwards. The skill reminds you.
+2. **Give your agent an API token** for that account (so it can create the server instead of dictating twenty clicks), and revoke it afterwards. The skill reminds you.
 3. **Buy a domain** — any cheap, neutral name you don't care about. It is the cover story, and a domain can get banned along with the IP.
 4. **Point the domain** at the server: either delegate it to DigitalOcean nameservers or add three A-records by hand. Step-by-step instructions for the common registrars are built in.
 
@@ -158,7 +167,7 @@ Budget: a small server (DigitalOcean listed the size the skill creates at $6/mon
 
 ## What the skill puts on your server
 
-Everything is installed by a self-contained `setup-exit.sh` / `setup-relay.sh` that Claude builds locally and delivers via cloud-init or SSH. The installers are idempotent — run them again to fix a half-finished install; existing clients, certificates and tokens are never overwritten.
+Everything is installed by a self-contained `setup-exit.sh` / `setup-relay.sh` that your agent builds locally and delivers via cloud-init or SSH. The installers are idempotent — run them again to fix a half-finished install; existing clients, certificates and tokens are never overwritten.
 
 **Exit server (abroad)**
 
@@ -218,9 +227,9 @@ More in [`references/architecture.md`](references/architecture.md) — including
 ## Repository layout
 
 ```
-SKILL.md                     the skill itself — how Claude runs the setup, step by step
+SKILL.md                     the skill itself — how the agent runs the setup, step by step
 references/
-  human-steps.md             every manual step: what has to happen and what Claude verifies
+  human-steps.md             every manual step: what has to happen and what the agent verifies
   lang/en.md, lang/ru.md     the words for every human-facing moment, per language (ru is the tested wording)
   lang/handout-en.md, -ru.md handout templates
   providers/*.md             one dated file per hosting provider: layer, automation, payment, click paths
@@ -257,11 +266,11 @@ Internally the scripts still call themselves `vpn-kit` (`/opt/vpn-kit`, `/root/v
 
 The skill and this guide are free and stay free. If you get stuck, [open an issue](https://github.com/antongavrilov88/homeport-skill/issues) — remove tokens, keys and server addresses from anything you paste. Security problems go through [private reporting](SECURITY.md), not an issue.
 
-If you'd rather not do it at all: a hosted agent does the setup in a chat for $29 once, paid to Homeport. It opens in November — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only. The server stays yours; I never hold your card or your account.
+If you'd rather not do it at all: Homeport's agent does the setup in a chat for $29 once, paid to Homeport. It opens in January 2027 — [join the waitlist](https://t.me/burrow_vpn_bot); details on the [Homeport site](https://antongavrilov88.github.io/homeport/). Not included: the server and the domain, billed by your providers. Refund: automatic if the check fails; otherwise on request within 14 days. It covers the setup, not your network. At launch: DigitalOcean only. The server stays yours; I never hold your card or your account.
 
 ## Who's behind this
 
-I'm Anton Gavrilov, a frontend engineer. I built this for my parents, then for a friend, then wrote it down so Claude could do it for anyone. Built in public: [LinkedIn](https://linkedin.com/in/agavrilov88).
+I'm Anton Gavrilov, a frontend engineer. I built this for my parents, then for a friend, then wrote it down so an AI coding agent could do it for anyone. Built in public: [LinkedIn](https://linkedin.com/in/agavrilov88).
 
 ## License
 

@@ -52,6 +52,8 @@ What stays allowed: the *language* sense — "the panel is in Russian", `lang/ru
 
 **Product name.** The product is **Homeport**, spelled exactly that way: one word, only the H capitalised. It used to be called Burrow. The same guard fails on the whole word `burrow`, case-insensitive, anywhere except `CHANGELOG.md` (history), this file and the guard itself, and lines that tell the rename story: `formerly Burrow` in the skill description, the README's "Upgrading from Burrow" note with its `marketplace remove burrow` and `~/.claude/skills/burrow` commands, and the `"burrow"` keyword in `.claude-plugin/`. To allow a new line, add a narrow pattern to `OLD_NAME_ALLOWED` in `.github/wording-guard.sh` and say why in the PR. The server-side working name `vpn-kit` is not affected.
 
+**Naming the agent.** Homeport is a skill for AI coding agents; Claude Code is the one it has been tested with. In public text, "your agent" is the free path (the person runs the skill in an agent of their choice) and "Homeport's agent" is the paid one (the hosted setup). "Claude" appears only where a statement is true only of Claude: the tested row of the requirements table, the plugin install and update, claude.ai, the upgrade note. A sentence about what the skill does in general says "the agent" or "your agent", never "Claude".
+
 ## Rules the skill itself follows (keep them when you change it)
 
 The list under "Hard rules" in `README.md`. A PR that weakens one of them needs a written reason.
