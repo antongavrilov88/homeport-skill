@@ -135,7 +135,7 @@ ssh root@ADDRESS 'bash /root/setup-relay.sh'
 
 **What happens:** the **ntfy** app → **+** → **Subscribe to topic** → **Use another server** on → `https://push.<domain>` → topic, login, password from `params.json` (`ntfy_topic`, `ntfy_user`, `ntfy_pass`).
 
-**You verify:** send a test from the server (the one-liner in `operations.md`) and ask whether it arrived. If the self-hosted ntfy did not come up, the public fallback topic on ntfy.sh still works (`ntfy_public_topic`); say which one they are subscribed to.
+**You verify:** send a test from the server (the one-liner in `operations.md`) and ask whether it arrived. Every alert goes to two places at once, always: the self-hosted ntfy and a public topic on ntfy.sh (`ntfy_public_topic`, no login). If the self-hosted ntfy did not come up, the public topic is the only one that works; say which one they are subscribed to.
 
 ---
 
