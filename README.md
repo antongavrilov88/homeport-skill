@@ -186,7 +186,7 @@ Everything is installed by a self-contained `setup-exit.sh` / `setup-relay.sh` t
 
 Config lives in `/etc/vpn-monitor/` and `/etc/wireguard/`; state in `/var/lib/vpn-monitor/`. Nothing phones home to anyone but your own ntfy.
 
-**Languages.** The skill talks to you in whatever language you write in, and the handout comes in that language. The web panel and the watchdog's push notifications are in English. Still in Russian in this version: what the installers print, the cover-site template, and the monthly drill's notifications (two-server layout only) — the handout lists what those notifications mean. A server installed before 0.6.0 keeps its Russian panel until you switch it (`references/operations.md`).
+**Languages.** The skill talks to you in whatever language you write in, and the handout comes in that language. The web panel and all push notifications are in English. Still in Russian in this version: what the installers print and the cover-site template. A server installed before 0.6.0 keeps its Russian panel and notifications until you switch it (`references/operations.md`).
 
 ### Privacy, stated plainly
 

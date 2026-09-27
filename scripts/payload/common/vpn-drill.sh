@@ -1,17 +1,17 @@
 #!/bin/bash
-# Учебное падение основного канала: блокируем путь релей → выход на 443, смотрим, как отработает
-# сторож, снимаем блокировку. Страховка снимает её в любом случае.
+# Drill: a staged outage of the tunnel. Block the relay → exit path on 443, watch how the
+# watchdog handles it, lift the block. A safety net lifts it in any case.
 #
-# Почему обычный запуск уходит в фон: учения рвут ровно тот канал, через который оператор
-# чаще всего и подключён к серверу. Запущенный из такой ssh-сессии скрипт умрёт вместе с ней
-# посреди прогона — с уже поднятой блокировкой, которую снимет только страховочный таймер,
-# через SAFETY_MIN минут. Поэтому обычный запуск перезапускает себя отдельным systemd-юнитом
-# и сразу отдаёт управление; --fg выполняет прогон в текущем процессе (так его зовёт systemd).
+# Why a plain run goes to the background: the drill breaks exactly the path the operator is
+# most often connected to the server through. Started from such an ssh session, the script
+# would die with it mid-run — with the block still up, lifted only by the safety timer after
+# SAFETY_MIN minutes. So a plain run re-launches itself as a separate systemd unit and returns
+# at once; --fg runs in the current process (that is how systemd calls it).
 #
-#   vpn-drill.sh          — прогон с отчётом в уведомления, в фоновом юните
-#   vpn-drill.sh --check  — только проверка готовности, без падения
-#   vpn-drill.sh --force  — не откладывать, даже если каналом сейчас пользуются
-#   vpn-drill.sh --fg     — прогон в текущем процессе, без фонового юнита
+#   vpn-drill.sh          — a run reported through notifications, in a background unit
+#   vpn-drill.sh --check  — readiness check only, no outage
+#   vpn-drill.sh --force  — do not postpone, even if people are using the tunnel right now
+#   vpn-drill.sh --fg     — a run in the current process, no background unit
 set -u
 CHECK=""; FORCE=""; FG=""
 for arg in "$@"; do
@@ -19,21 +19,21 @@ for arg in "$@"; do
     --check) CHECK=1 ;;
     --force) FORCE=1 ;;
     --fg)    FG=1 ;;
-    *) echo "неизвестный ключ: $arg" >&2
-       echo "использование: vpn-drill.sh [--check] [--force] [--fg]" >&2
+    *) echo "unknown option: $arg" >&2
+       echo "usage: vpn-drill.sh [--check] [--force] [--fg]" >&2
        exit 2 ;;
   esac
 done
-# под systemd мы и так отдельный процесс — отделяться второй раз незачем
+# under systemd we already are a separate process — no need to detach twice
 [ -n "${INVOCATION_ID:-}" ] && FG=1
 . /etc/vpn-monitor/config.sh 2>/dev/null || true
 GW="${VPN_GW:-10.67.0.1}"
 if [ "${VPN_MODE:-relay}" = "single" ]; then
-  echo "Учения имеют смысл только в схеме с двумя машинами: на одной машине переключаться некуда." >&2
+  echo "The drill only makes sense on the two-server layout: on one server there is nowhere to fail over to." >&2
   exit 1
 fi
 EXIT_IP=$(python3 -c "import json;print(json.load(open('/usr/local/etc/xray/config.json'))['outbounds'][0]['settings']['vnext'][0]['address'])" 2>/dev/null)
-[ -n "$EXIT_IP" ] || { echo "не смог прочитать адрес выходной машины из конфига Xray" >&2; exit 1; }
+[ -n "$EXIT_IP" ] || { echo "could not read the exit server address from the Xray config" >&2; exit 1; }
 STATE=/var/lib/vpn-monitor/health.json
 LOG=/var/lib/vpn-monitor/drill.log
 SAFETY_MIN=10
@@ -50,7 +50,7 @@ m.notify(sys.argv[1], sys.argv[2], sys.argv[3])
 PY
 }
 read_set() {
-  # nft переносит длинный набор на несколько строк, поэтому не grep, а разбор целиком
+  # nft wraps a long set over several lines, so parse it whole instead of grep
   python3 - <<'PYEOF'
 import re, subprocess
 try:
@@ -65,8 +65,8 @@ PYEOF
 tunnel_ok() { curl -s -m 8 -x socks5h://127.0.0.1:1080 -o /dev/null -w "%{http_code}" https://www.gstatic.com/generate_204 | grep -qE "20[04]"; }
 fallback_ok() { curl -s -m 8 --interface "$GW" -o /dev/null -w "%{http_code}" https://www.gstatic.com/generate_204 | grep -qE "20[04]"; }
 
-# Пользуется ли кто-нибудь каналом прямо сейчас: сумма дельт трафика за последние
-# QUIET_SEC секунд. Базы нет — смотрим на свежие рукопожатия WireGuard.
+# Is anyone using the tunnel right now: the sum of traffic deltas over the last
+# QUIET_SEC seconds. No database — look for recent WireGuard handshakes.
 anyone_active() {
   if [ -f "$STATS_DB" ]; then
     python3 - "$STATS_DB" "$QUIET_SEC" "$QUIET_MB" <<'PY'
@@ -89,43 +89,43 @@ PY
 
 echo "=== $(date -Is) drill start" >> $LOG
 
-# --- проверка готовности: без неё падение устраивать нельзя
-tunnel_ok || { notify "Учения отменены" "Основной канал и так не работает — сначала надо разобраться с этим." high; echo "abort: tunnel down" >> $LOG; exit 1; }
-fallback_ok || { notify "Учения отменены" "Запасной путь не отвечает — падать некуда. Это само по себе повод посмотреть." urgent; echo "abort: fallback down" >> $LOG; exit 1; }
-systemctl is-active --quiet vpn-watchdog || { notify "Учения отменены" "Сторож не запущен, некому реагировать." high; echo "abort: watchdog down" >> $LOG; exit 1; }
-notify "Готовность к учениям" "Основной канал работает, запасной работает, сторож на посту." >/dev/null
+# --- readiness check: no outage without it
+tunnel_ok || { notify "VPN: drill cancelled" "The tunnel is already down — sort that out first." high; echo "abort: tunnel down" >> $LOG; exit 1; }
+fallback_ok || { notify "VPN: drill cancelled" "The fallback route is not responding — there is nowhere to fail over to. That alone needs a look." urgent; echo "abort: fallback down" >> $LOG; exit 1; }
+systemctl is-active --quiet vpn-watchdog || { notify "VPN: drill cancelled" "The watchdog is not running, nothing would react." high; echo "abort: watchdog down" >> $LOG; exit 1; }
+notify "VPN: ready for the drill" "The tunnel works, the fallback route works, the watchdog is running." >/dev/null
 
 if [ -n "$CHECK" ]; then echo "check ok" >> $LOG; exit 0; fi
 
-# --- учения не должны ронять тех, кто прямо сейчас работает
+# --- the drill must not cut off people who are using the tunnel right now
 if [ -z "$FORCE" ] && anyone_active; then
-  notify "Учения отложены" "Каналом сейчас пользуются — прогон не проводился. Попробуем в следующий раз."
+  notify "VPN: drill postponed" "The tunnel is in use right now — no run this time. It will try again next time."
   echo "skip: clients active" >> $LOG
-  echo "Каналом сейчас пользуются — учения отложены."
-  echo "Провести всё равно: /usr/local/sbin/vpn-drill.sh --force"
+  echo "The tunnel is in use right now — drill postponed."
+  echo "To run it anyway: /usr/local/sbin/vpn-drill.sh --force"
   exit 3
 fi
 
-# --- уходим в отдельный юнит: разрыв ssh-сессии не должен убить прогон с поднятой блокировкой
+# --- move to a separate unit: a dropped ssh session must not kill a run with the block up
 if [ -z "$FG" ]; then
   systemctl stop vpn-drill-manual.service >/dev/null 2>&1 || true
   systemctl reset-failed vpn-drill-manual.service >/dev/null 2>&1 || true
-  if systemd-run --unit=vpn-drill-manual --description="Учения по запросу" --quiet \
+  if systemd-run --unit=vpn-drill-manual --description="Drill on request" --quiet \
        /usr/local/sbin/vpn-drill.sh --fg ${FORCE:+--force} >/dev/null 2>&1; then
-    echo "Учения запущены в фоне: минуту-две зарубежные сайты будут недоступны, местные продолжат открываться. Если вы подключены к серверу через этот VPN, ваша сессия оборвётся — так и задумано."
-    echo "Отчёт придёт push-уведомлением. Журнал: tail -n 20 /var/lib/vpn-monitor/drill.log"
+    echo "Drill started in the background: for a minute or two foreign sites will be unavailable, local sites stay reachable. If you are connected to the server through this VPN, your session will drop — that is expected."
+    echo "The report arrives as a push notification. Log: tail -n 20 /var/lib/vpn-monitor/drill.log"
     exit 0
   fi
-  echo "systemd-run не сработал — провожу учения в текущем процессе." >&2
+  echo "systemd-run failed — running the drill in the current process." >&2
 fi
 
-BEFORE=$(read_set); BEFORE="${BEFORE:-пусто}"
+BEFORE=$(read_set); BEFORE="${BEFORE:-empty}"
 echo "before: $BEFORE" >> $LOG
 
-# --- страховка: снимет блокировку, даже если скрипт умрёт
+# --- safety net: lifts the block even if the script dies
 systemctl stop drill-cleanup.timer drill-cleanup.service >/dev/null 2>&1 || true
 systemctl reset-failed drill-cleanup.service >/dev/null 2>&1 || true
-systemd-run --on-active=${SAFETY_MIN}min --unit=drill-cleanup --description="Снять учебную блокировку" \
+systemd-run --on-active=${SAFETY_MIN}min --unit=drill-cleanup --description="Lift the drill block" \
   /usr/sbin/nft delete table ip drill >/dev/null 2>&1
 
 nft -f - <<EOF
@@ -140,7 +140,7 @@ table ip drill {
 EOF
 T0=$(date +%s); echo "blocked at $(date -Is)" >> $LOG
 
-# --- ждём переключения (сторож должен уложиться в ~90 секунд)
+# --- wait for the failover (the watchdog should manage within ~90 seconds)
 FAILOVER_AT=""
 for i in $(seq 1 40); do
   sleep 5
@@ -153,7 +153,7 @@ nft delete table ip drill 2>/dev/null
 systemctl stop drill-cleanup.timer 2>/dev/null
 echo "unblocked at $(date -Is)" >> $LOG
 
-# --- ждём возврата
+# --- wait for the restore
 RESTORE_AT=""
 for i in $(seq 1 60); do
   sleep 5
@@ -162,12 +162,12 @@ for i in $(seq 1 60); do
   fi
 done
 
-AFTER=$(read_set); AFTER="${AFTER:-пусто}"
-echo "after: $AFTER | failover=${FAILOVER_AT:-нет} restore=${RESTORE_AT:-нет}" >> $LOG
+AFTER=$(read_set); AFTER="${AFTER:-empty}"
+echo "after: $AFTER | failover=${FAILOVER_AT:-none} restore=${RESTORE_AT:-none}" >> $LOG
 
 if [ -n "$FAILOVER_AT" ] && [ -n "$RESTORE_AT" ] && [ "$BEFORE" = "$AFTER" ]; then
-  notify "Учения: всё сработало" "Переключение на запасной путь через ${FAILOVER_AT} с после падения, возврат через ${RESTORE_AT} с. Состав клиентов восстановлен точно."
+  notify "VPN: drill passed" "Failover to the fallback route ${FAILOVER_AT} s after the outage, restore after ${RESTORE_AT} s. The client set was restored exactly."
 else
-  notify "Учения: есть замечания" "Переключение: ${FAILOVER_AT:-НЕ ПРОИЗОШЛО} с, возврат: ${RESTORE_AT:-НЕ ПРОИЗОШЁЛ} с. Было: $BEFORE / стало: $AFTER. Нужно посмотреть." urgent
+  notify "VPN: drill needs a look" "Failover: ${FAILOVER_AT:-DID NOT HAPPEN} s, restore: ${RESTORE_AT:-DID NOT HAPPEN} s. Before: $BEFORE / after: $AFTER. Needs a look." urgent
 fi
 echo "=== $(date -Is) drill end" >> $LOG

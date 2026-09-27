@@ -16,22 +16,22 @@ route, issuing a new client with a QR code, removal, and the direct-domain list.
 
 ## Switch an existing server's panel to English
 
-Servers installed before 0.6.0 keep the Russian panel and Russian notifications until you do this; nothing changes on its own. It replaces three files on the machine that runs the panel (the relay, or the exit in the `single` profile) and restarts two services. Only words change: the three files have the same logic in every release, and clients, routes, the admin code and the stats stay as they are. Do it while the panel says **Tunnel OK** (or the Russian «Туннель в порядке»), not during a failover.
+Servers installed before 0.6.0 keep the Russian panel and Russian notifications until you do this; nothing changes on its own. It replaces the panel, the monitor and the watchdog on the machine that runs the panel (the relay, or the exit in the `single` profile) — and, on the relay, the drill — then restarts two services. Clients, routes, the admin code and the stats stay as they are. `vpn-monitor.py` and `vpn-watchdog.py` have the same logic in every release, so for them only words change; the panel and the drill also bring the fixes of earlier releases to an older server (from 0.4.0 the one-server panel hides the route controls; from 0.3.0 the drill postpones itself while people are online and runs detached). Do it while the panel says **Tunnel OK** (or the Russian «Туннель в порядке»), not during a failover or a drill.
 
 From the skill's folder, on the operator's computer:
 
 ```bash
-scp scripts/payload/common/dashboard.html scripts/payload/common/vpn-monitor.py \
-    scripts/payload/common/vpn-watchdog.py root@<server>:/root/
+scp scripts/payload/common/dashboard.html scripts/payload/common/vpn-monitor.py     scripts/payload/common/vpn-watchdog.py scripts/payload/common/vpn-drill.sh root@<server>:/root/
 ssh root@<server> 'install -m644 /root/dashboard.html /usr/local/share/vpn-monitor/index.html \
   && install -m755 /root/vpn-monitor.py /root/vpn-watchdog.py /usr/local/sbin/ \
-  && rm /root/dashboard.html /root/vpn-monitor.py /root/vpn-watchdog.py \
+  && { [ ! -f /usr/local/sbin/vpn-drill.sh ] || install -m755 /root/vpn-drill.sh /usr/local/sbin/; } \
+  && rm /root/dashboard.html /root/vpn-monitor.py /root/vpn-watchdog.py /root/vpn-drill.sh \
   && systemctl restart vpn-monitor vpn-watchdog \
   && systemctl is-active vpn-monitor vpn-watchdog \
   && curl -s http://127.0.0.1:8088/ | grep -o "<title>[^<]*</title>"'
 ```
 
-Expect `active` twice and `<title>VPN traffic</title>`; with a non-default `dashboard_port`, use that port. Then reload the panel in the browser. The monthly drill's notifications stay in Russian in this release. Re-running an installer built from 0.6.0 or later puts the same English files in place.
+The drill is replaced only where it is installed (the relay); a `single` server has none and gets none. Expect `active` twice and `<title>VPN traffic</title>`; with a non-default `dashboard_port`, use that port. Then reload the panel in the browser. On the relay, `sudo /usr/local/sbin/vpn-drill.sh --check` sends "VPN: ready for the drill" in English without breaking anything. Re-running an installer built from 0.6.0 or later puts the same English files in place.
 
 ## Issue a device from the shell
 

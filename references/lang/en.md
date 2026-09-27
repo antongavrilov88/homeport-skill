@@ -216,4 +216,8 @@ The labels as the panel shows them, for explaining in the person's language. A s
 | VPN: tunnel still down | the tunnel is still down (hourly reminder) |
 | VPN: diagnostic snapshot saved | a diagnostic snapshot was saved |
 | VPN: clients moved back to the tunnel | clients moved back to the tunnel after a reboot |
-| «Готовность к учениям» / «Учения: всё сработало» / «Учения: есть замечания» / «Учения отложены» / «Учения отменены» | the monthly drill, still in Russian: ready for the drill / drill: all good / drill: needs a look / drill postponed / drill cancelled |
+| VPN: ready for the drill | the weekly readiness check passed (relay only) |
+| VPN: drill passed | the monthly drill: failover and restore worked, clients restored exactly (relay only) |
+| VPN: drill needs a look | the monthly drill found a problem (urgent, relay only) |
+| VPN: drill postponed | people were online, the drill will try next time (relay only) |
+| VPN: drill cancelled | the drill did not start: tunnel, fallback route or watchdog not ready (relay only) |

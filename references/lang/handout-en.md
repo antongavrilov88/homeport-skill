@@ -149,4 +149,4 @@ The keys and passwords are in a separate file, `params.json`. **It must not be l
 | VPN: tunnel restored | the tunnel is back |
 | VPN: fallback route not responding | the fallback route isn't responding — worth a look |
 | VPN: tunnel still down | the tunnel is still down |
-| «Учения: всё сработало» / «Учения: есть замечания» (in Russian) | the monthly self-test: all good / needs a look |
+| VPN: drill passed / VPN: drill needs a look | the monthly self-test: all good / needs a look |
