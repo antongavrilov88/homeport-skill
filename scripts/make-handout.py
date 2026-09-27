@@ -106,7 +106,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--params", required=True)
     ap.add_argument("--out", default="pamyatka.md")
-    ap.add_argument("--price-exit", default="$6")
+    ap.add_argument("--price-exit", required=True,
+                    help="the exit's monthly price quoted at setup (the host's listed price); no default: hosts change prices")
     ap.add_argument("--price-relay", default="")
     a = ap.parse_args()
     p = json.load(open(a.params, encoding="utf-8"))
