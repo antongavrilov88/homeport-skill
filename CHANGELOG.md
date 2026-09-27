@@ -6,6 +6,7 @@ Website changes live in the site repo's changelog: https://github.com/antongavri
 
 - docs(skill): the failover sentences say what `make-handout.py` already says (#39): on the direct route local sites stay reachable and foreign sites are unavailable until the tunnel is back. `SKILL.md`, `references/lang/en.md`, `lang/handout-en.md`, `lang/ru.md`, `lang/handout-ru.md` and `references/architecture.md` had promised that the internet keeps working without the tunnel, which is wrong on carrier-restricted networks. The two Russian lines take the handout generator's own wording; they changed without a new family test. The informal trigger phrase in the skill description is now the neutral "my VPN keeps getting blocked" (the plugin wrapper's frontmatter follows).
 - ci(repo): `.github/wording-guard.sh` matches the Cyrillic terms as stems, so every case form fails, not only the dictionary form (#39). A second check fails on phrasings that cast Homeport as a way around a network's restrictions; the seven patterns and the approved alternatives are listed in `CONTRIBUTING.md`, "Wording rules". The site repo's guard gets the same patterns.
+- fix(installer): the line `vpn-drill.sh` writes to its log when it lifts the simulated outage now says "restored" (#39); the old word matched the new wording guard. One string in a file the installer puts on the server; no logic change.
 
 ## 0.6.0 — 2026-09-27
 
