@@ -156,7 +156,7 @@ button.mini.danger:hover{border-color:var(--series-wg);color:var(--series-wg)}
   font-size:11.5px;line-height:1.5;overflow-x:auto;margin:0 0 14px;white-space:pre;color:var(--text-secondary)}
 .modal .row{display:flex;gap:8px;flex-wrap:wrap}
 .modal .err{display:block;margin-bottom:12px}
-.only-single{display:none}
+body:not([data-mode="single"]) .only-single{display:none !important}
 body[data-mode="single"] .only-multipath{display:none !important}
 body[data-mode="single"] .only-single{display:inline}
 </style>
