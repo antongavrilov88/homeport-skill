@@ -156,7 +156,7 @@ button.mini.danger:hover{border-color:var(--series-wg);color:var(--series-wg)}
   font-size:11.5px;line-height:1.5;overflow-x:auto;margin:0 0 14px;white-space:pre;color:var(--text-secondary)}
 .modal .row{display:flex;gap:8px;flex-wrap:wrap}
 .modal .err{display:block;margin-bottom:12px}
-.only-single{display:none}
+body:not([data-mode="single"]) .only-single{display:none !important}
 body[data-mode="single"] .only-multipath{display:none !important}
 body[data-mode="single"] .only-single{display:inline}
 </style>
@@ -325,7 +325,8 @@ function chart(d) {
   const ticks = 4, gy = [], ly = [];
   for (let i=0;i<=ticks;i++){ const v = maxV*i/ticks; gy.push(y(v)); ly.push(fmtRate(v)); }
   const xt = [];
-  const step = Math.max(1, Math.round(pts.length/6));
+  const nx = d.hours>24 ? Math.max(2, Math.min(6, Math.floor(iw/90))) : 6;   // 7-day labels are ~75px wide: one per 90px
+  const step = Math.max(1, Math.round(pts.length/nx));
   for (let i=0;i<pts.length;i+=step) xt.push(pts[i].t);
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Traffic chart">
     <g class="grid">${gy.map(v=>`<line x1="${m.l}" x2="${W-m.r}" y1="${v.toFixed(1)}" y2="${v.toFixed(1)}"/>`).join("")}</g>
