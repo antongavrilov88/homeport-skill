@@ -1,4 +1,4 @@
-# Tag v1.2.3 on main -> GitHub Release with burrow-skill.zip (the skill only, no site).
+# Tag v1.2.3 on main -> GitHub Release with homeport-skill.zip (the skill only, no site).
 # Tag v1.2.3-rc.1 -> pre-release.
 name: release
 on:
@@ -15,15 +15,15 @@ jobs:
         run: |
           python3 -m py_compile scripts/*.py scripts/payload/common/*.py
           bash -n scripts/payload/exit/install.sh scripts/payload/relay/install.sh scripts/payload/common/*.sh
-          grep -q '^name: burrow' SKILL.md
+          grep -q '^name: homeport' SKILL.md
       - name: Pack the skill
         run: |
           find scripts -name __pycache__ -type d -prune -exec rm -rf {} +
-          mkdir -p dist/burrow
-          cp -r SKILL.md LICENSE README.md references scripts dist/burrow/
-          (cd dist && zip -qr burrow-skill.zip burrow)
+          mkdir -p dist/homeport
+          cp -r SKILL.md LICENSE README.md references scripts dist/homeport/
+          (cd dist && zip -qr homeport-skill.zip homeport)
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/burrow-skill.zip
+          files: dist/homeport-skill.zip
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-rc') }}

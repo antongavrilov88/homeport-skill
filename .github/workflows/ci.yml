@@ -22,11 +22,11 @@ jobs:
               t = open(path, encoding="utf-8").read()
               block = re.match(r"^---\n(.*?)\n---\n", t, re.S).group(1)
               return dict(re.findall(r"^(name|description):\s*(.*)$", block, re.M))
-          root, wrap = fm("SKILL.md"), fm("skills/burrow/SKILL.md")
-          assert root == wrap, "skills/burrow/SKILL.md frontmatter must equal SKILL.md's: regenerate it"
+          root, wrap = fm("SKILL.md"), fm("skills/homeport/SKILL.md")
+          assert root == wrap, "skills/homeport/SKILL.md frontmatter must equal SKILL.md's: regenerate it"
           plugin = json.load(open(".claude-plugin/plugin.json"))
           market = json.load(open(".claude-plugin/marketplace.json"))
-          assert plugin["name"] == "burrow" and market["plugins"][0]["name"] == "burrow"
+          assert plugin["name"] == "homeport" and market["plugins"][0]["name"] == "homeport" and market["name"] == "homeport"
           assert market["plugins"][0]["source"] == "./"
           assert market["plugins"][0].get("version") == plugin["version"], "version differs between plugin.json and marketplace.json"
           latest = re.search(r"^## (\d+\.\d+\.\d+)", open("CHANGELOG.md", encoding="utf-8").read(), re.M).group(1)
@@ -38,7 +38,7 @@ jobs:
       - name: No secrets in the tree
         run: |
           ! grep -rnE 'dop_v1_[A-Za-z0-9]{20,}|tk_[a-z0-9]{20,}|BEGIN (RSA|OPENSSH|EC) PRIVATE' --exclude-dir=.git . || (echo "possible secret committed" && exit 1)
-      - name: No country-specific wording
+      - name: Wording guard (no country-specific terms, no old product name)
         run: bash .github/wording-guard.sh
       - name: No placeholders on main
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'

@@ -1,6 +1,6 @@
 ---
-name: burrow
-description: 'Use when someone wants a personal VPN on a server they rent themselves — "set up my own VPN", "VPN for my parents", "get around the blocking", "deploy an Xray / REALITY / WireGuard server", "подними мне впн", "нужен впн родителям", "хочу свой ВПН", burrow. Built for a person with no technical background: it asks in plain words, does the work itself and walks the few manual steps button by button. Delivers VLESS + XHTTP + REALITY plus WireGuard, a web panel that issues devices by QR, a watchdog that restarts what fails (automatic failover on the two-server layout), and push alerts to the phone.'
+name: homeport
+description: 'Use when someone wants a personal VPN on a server they rent themselves — "set up my own VPN", "VPN for my parents", "get around the blocking", "deploy an Xray / REALITY / WireGuard server", "подними мне впн", "нужен впн родителям", "хочу свой ВПН", homeport (formerly Burrow). Built for a person with no technical background: it asks in plain words, does the work itself and walks the few manual steps button by button. Delivers VLESS + XHTTP + REALITY plus WireGuard, a web panel that issues devices by QR, a watchdog that restarts what fails (automatic failover on the two-server layout), and push alerts to the phone.'
 ---
 
 # A personal VPN, done for the person
