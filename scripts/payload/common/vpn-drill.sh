@@ -151,7 +151,7 @@ done
 
 nft delete table ip drill 2>/dev/null
 systemctl stop drill-cleanup.timer 2>/dev/null
-echo "unblocked at $(date -Is)" >> $LOG
+echo "restored at $(date -Is)" >> $LOG
 
 # --- wait for the restore
 RESTORE_AT=""
