@@ -1,6 +1,7 @@
 ---
 name: homeport
 description: 'Use when someone wants a personal VPN on a server they rent themselves — "set up my own VPN", "VPN for my parents", "my VPN keeps getting blocked", "deploy an Xray / REALITY / WireGuard server", homeport (formerly Burrow). Built for a person with no technical background: it asks in plain words, does the work itself and walks the few manual steps button by button. Delivers VLESS + XHTTP + REALITY plus WireGuard, a web panel that issues devices by QR, a watchdog that restarts what fails (automatic failover on the two-server layout), and push alerts to the phone.'
+compatibility: 'Needs a shell with network access to the hosting API and SSH to the server, plus Python 3 (standard library only). Tested with Claude Code; other agents that load the Agent Skills format are untested. In a sandbox with no outside network (claude.ai with code execution) it only generates keys and installers and the person runs the commands.'
 ---
 
 # A personal VPN, done for the person
@@ -20,6 +21,7 @@ You are setting up a personal VPN on a server the person rents, and you hand ove
 | You have | What changes |
 |---|---|
 | A shell **and** network access to the hosting API and the servers (Claude Code on a laptop, a desktop session with a terminal) | Full automation: you create the server, set DNS, install over cloud-init or SSH, verify. The steps below assume this. |
+| Another agent with a shell and network access — Codex CLI, Gemini CLI, Cursor and the like, loading the same Agent Skills format | Works like the first row. Nobody has run a full setup through them yet; say so to the person once, then proceed as in the first row. |
 | A shell but **no network to the outside** (claude.ai with code execution: a sandbox that cannot reach the person's server or the hosting API) | You still generate keys and installers — the scripts are pure Python. The person does the clicking: creates the server in the provider's console with `out/setup-exit.sh` pasted into the "user data" field, runs the two SSH lines for everything else, and reads command output back to you. **Say this at the very start, once**, so nobody waits for a connection you cannot make. `provision-do.py` is useless here; the console click paths are in `references/providers/`. The person needs their own SSH access to the machine (their own key at creation, or the provider's root-password reset); the first device then comes from the panel through their own port-forward or from a QR printed in their terminal (step 7). DNS checks: ask them to open dnschecker.org. |
 | No shell at all | Stop. Keys cannot be generated in a chat. Point them to Claude Code or to the hosted agent (link in the README). |
 
@@ -45,7 +47,7 @@ Do not skip steps and do not reorder them: each one relies on the check at the e
 
 ### 0. One question chooses the layout
 
-Ask this first, in plain words (with AskUserQuestion if you have it; the questions of this step are the only place where you ask several things in one message):
+Ask this first, in plain words (with a multiple-choice question tool if you have one; the questions of this step are the only place where you ask several things in one message):
 
 > **Where are the people who'll use this, and does their network restrict direct foreign connections or only allow listed IP ranges (typical on carrier-restricted mobile networks)?**
 
@@ -234,7 +236,7 @@ python3 scripts/make-handout.py --params params.json --out handout.md \
 
 Any other language: translate the generated `handout.md` into the person's language — the same sections in the same order, the same numbers and warnings. The addresses, the panel code, the button names and the alert titles stay exactly as printed: the panel and the alerts are English. (`references/lang/handout-en.md` is the reference copy of the same text.)
 
-Send it as a file (SendUserFile, or whatever file hand-over your environment has). **Never publish it as a page**: it contains the panel code and the alert password. If a line is wrong for this family, say so in one sentence or correct that line in the generated file, not in the script.
+Send it as a file, with your environment's way of handing over a file. **Never publish it as a page**: it contains the panel code and the alert password. If a line is wrong for this family, say so in one sentence or correct that line in the generated file, not in the script.
 
 ### 9. Say goodbye
 

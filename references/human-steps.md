@@ -104,7 +104,7 @@ Everything else the skill does itself. This file covers only what technically ca
 
 Only when you have no SSH access from where you run.
 
-**What happens:** you send `setup-exit.sh` or `setup-relay.sh` (SendUserFile) and two lines; they open a terminal and paste. The three things that confuse everyone — the invisible password, the `yes/no` question, the password asked twice — are scripted in `lang/en.md` §7, together with how to open a terminal on Mac, Windows and Linux and the PowerShell paste quirk.
+**What happens:** you send `setup-exit.sh` or `setup-relay.sh` (with your environment's way of handing over a file) and two lines; they open a terminal and paste. The three things that confuse everyone — the invisible password, the `yes/no` question, the password asked twice — are scripted in `lang/en.md` §7, together with how to open a terminal on Mac, Windows and Linux and the PowerShell paste quirk.
 
 **The lines** (substitute the real address; `sudo bash` instead of `bash` when the login is not root):
 
