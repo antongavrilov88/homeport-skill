@@ -90,13 +90,35 @@ Everything else the skill does itself. This file covers only what technically ca
 
 **What happens:** they order the cheapest Ubuntu 24.04 VPS with a dedicated IPv4 at a provider in that country — `providers/yandex-cloud.md`, `providers/generic-ubuntu.md`, and the dated relay-capable list in `provisioning.md`; a flat-rate VPS beats a metered cloud for a household. Check the traffic quota (everything passes twice) and that it is a different provider from the exit's.
 
+**The address has to be static** (`provisioning.md`, "The relay's address"): every device config will carry it, so it must survive a stop or a re-creation of the machine. Where the provider can make the address the machine got at creation static in place, do that as soon as it has passed the check below; otherwise reserve a static address and attach it before the check. The buttons are in the provider file, under the provider's own name for it (static, reserved, elastic or floating IP).
+
 **What you need from them:** the address, the login (root, or a user with passwordless sudo) and the password or key — providers email these right after payment.
+
+**Before the install: do the users' phones reach this address?** About two minutes for the person (`lang/en.md` §6). On networks that only allow listed address ranges one address gets through where the next one does not, and the result differs by carrier and by region — so check the relay's address from the users' own mobile network before anything is built on it:
+
+1. If the provider has a security group or cloud firewall, the person adds an inbound rule for `80` tcp next to the relay's rules from the provider file.
+2. You put a one-page web server on the relay's port 80 that stops by itself after fifteen minutes, and check it from your side:
+
+   ```bash
+   # on the relay, over SSH
+   mkdir -p /tmp/reach-test && echo 'It works' > /tmp/reach-test/index.html
+   sudo systemd-run --unit=reach-test --collect timeout 900 python3 -m http.server 80 --directory /tmp/reach-test
+   # from your session
+   curl -s --max-time 5 http://<relay address>      # prints: It works
+   ```
+
+   No "It works" from your side → the port 80 rule (the provider's, or `ufw` on the machine) or the web server (`sudo systemctl status reach-test`), not the carrier; fix that before the person tries. With no SSH from where you run, the person runs the two lines on the relay the way §7 describes, and opens the page on Wi-Fi first in place of your `curl`.
+3. The person opens `http://<relay address>` on a phone on the users' side, **Wi-Fi off**, on the mobile data of the carrier the family uses — one phone per carrier if they use more than one.
+4. **"It works"** → the address gets through; make it static now if it is not yet. **The page does not open** → swap in another address, in the same or another zone or region (the provider file says how), and check it the same way — start the web server again if it has stopped, with the machine or after fifteen minutes. Release the addresses that failed: a reserved address is billed while it sits unused. After two or three failed addresses, a different home-country provider.
+5. Stop the web server — `sudo systemctl stop reach-test; rm -rf /tmp/reach-test` on the relay — and have the `80` tcp rule removed (and your `ufw` rule, if you opened one). The installer opens only what the relay needs.
+
+This shows only that the address is reachable. The full check, with the tunnel, is still the first phone on mobile data after the install (step 7).
 
 **If you have to move it, move it before the QR codes go out.** The relay's address is written into every device config, so a relay that turns out not to be reachable on the users' mobile networks has to be replaced *before* anyone has scanned a code — afterwards it means re-issuing every device. That is exactly what the mobile-data test on the first device is for (step 7; `lang/en.md` §8): first `alt_port` 443, and only then a different provider in the same country.
 
 **Say it straight** (`lang/en.md` §6): the password passes through the chat; after the install you show them how to change it (`passwd`, one command).
 
-**You verify:** `ssh` in; `lsb_release -a` says 24.04; `curl -4 https://api.ipify.org` prints the address they gave you.
+**You verify:** `ssh` in; `lsb_release -a` says 24.04; `curl -4 https://api.ipify.org` prints the address they gave you — the static one that passed the phone check; the test web server is gone (`systemctl is-active reach-test` prints `inactive`) and so is the `80` tcp rule.
 
 ---
 
