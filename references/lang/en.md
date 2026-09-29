@@ -1,6 +1,6 @@
 # What you say — English
 
-Use one section at a time: take the section for the step you are on, retell it in your own words, wait for "done". Never paste this file, or a whole list of sections, into the chat. Section numbers match `references/human-steps.md`. Everything in quotation marks is meant to be said to the person, in their language: for a language other than English or Russian, translate from here as you go — the meaning and the warnings, not the sentences. The Russian file `ru.md` is tested with real families; use it verbatim.
+Use one section at a time: take the section for the step you are on, retell it in your own words, wait for "done". Never paste this file, or a whole list of sections, into the chat. Section numbers match `references/human-steps.md`. Everything in quotation marks is meant to be said to the person, in their language: this is the only wording file, so for any other language translate from here as you go — the meaning and the warnings, not the sentences.
 
 The click steps below are the spoken form of the DigitalOcean paths. `providers/digitalocean.md` is the canonical copy: when the provider's interface changes, update it first, then these two files.
 

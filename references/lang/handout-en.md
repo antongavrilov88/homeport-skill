@@ -1,6 +1,6 @@
 <!--
-English handout template. The Russian handout is produced by scripts/make-handout.py;
-this file mirrors its variables and rules so that any language stays in step with it.
+English handout template. scripts/make-handout.py writes this same text in English;
+the two change together, so any language translated from either stays in step.
 Render it yourself from params.json (never paste params.json into the chat).
 
 Variables:

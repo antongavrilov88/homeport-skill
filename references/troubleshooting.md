@@ -106,7 +106,7 @@ if not, ask who should be put back.
 - Open it only from inside the VPN, at `http://<subnet>.1:8088`. It does not exist
   from the outside — that is by design.
 - `systemctl status vpn-monitor`, `journalctl -u vpn-monitor -n 30`.
-- `admin code required` (`нужен код администратора` on a server installed before 0.6.0) → the code is in `/etc/vpn-monitor/admin-token`.
+- `admin code required` (the old Russian wording of the same error on a server installed before 0.6.0) → the code is in `/etc/vpn-monitor/admin-token`.
 
 ## An existing client's config cannot be downloaded
 
