@@ -97,7 +97,7 @@ First wait 2–3 minutes.
 <!-- FAILOVER: single -->
 Everything inside is built so that when something breaks, the system restarts what got stuck by itself and writes to you. Quite often everything comes back on its own within those couple of minutes.
 <!-- FAILOVER: relay -->
-Everything inside is built so that when something breaks, people are moved to the fallback route automatically within about a minute — the internet keeps working, just without the bypass. When the main channel is repaired, everyone is moved back, also by itself.
+Everything inside is built so that when something breaks, people are moved to the fallback route automatically within about a minute — local sites stay reachable, foreign sites are unavailable for that time. When the main channel is repaired, everyone is moved back, also by itself.
 <!-- both profiles from here -->
 
 What you can check yourself:

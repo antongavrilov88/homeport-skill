@@ -127,8 +127,8 @@ An engineering estimate, not statistics.
 **Not built.** A design note, kept here so the next person does not have to derive it again.
 
 Today the watchdog has exactly one place to put people when the tunnel dies: the
-relay's own direct route. On an ordinary network that is a real fallback — the
-internet keeps working, just without the tunnel. On a carrier-restricted network it
+relay's own direct route. On an ordinary network that is a real fallback —
+everything still opens, just without the tunnel. On a carrier-restricted network it
 barely is one: local sites stay reachable, foreign sites are unavailable, which is
 usually the part the household bought the VPN for. So the fallback that reads fine in
 a drill report is weakest exactly where the `relay` profile is most needed.
