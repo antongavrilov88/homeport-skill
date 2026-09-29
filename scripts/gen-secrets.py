@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Генерация секретов для новой установки. Никаких внешних зависимостей.
+"""Generates the secrets for a new install. No external dependencies.
 
     python3 gen-secrets.py --domain example.com [--push push.example.com] \
         [--email me@example.com] [--mode relay|single] > params.json
@@ -10,7 +10,7 @@ P = 2 ** 255 - 19
 
 
 def _mul(k: bytes, u: bytes) -> bytes:
-    """X25519 по RFC 7748 — чистый Python, чтобы не тянуть зависимости."""
+    """X25519 per RFC 7748 in pure Python, so no dependencies are pulled in."""
     def dec(b):
         b = bytearray(b)
         b[31] &= 127
@@ -66,7 +66,7 @@ def x25519_pair():
 
 
 def _selfcheck():
-    """Тестовый вектор RFC 7748 §6.1 — если не сходится, ключи брать нельзя."""
+    """RFC 7748 §6.1 test vector: if it does not match, the keys must not be used."""
     a = bytes.fromhex("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a")
     apub = bytes.fromhex("8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a")
     b = bytes.fromhex("5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb")
@@ -92,7 +92,7 @@ def main():
     ap.add_argument("--wg-port", type=int, default=51821)
     ap.add_argument("--home-geoip", default="")
     ap.add_argument("--site-title", default="")
-    ap.add_argument("--site-tagline", default="Заметки о самостоятельном хостинге")
+    ap.add_argument("--site-tagline", default="Notes on self-hosting")
     ap.add_argument("--xray-version", default="v26.3.27")
     ap.add_argument("--ntfy-version", default="v2.27.0")
     a = ap.parse_args()

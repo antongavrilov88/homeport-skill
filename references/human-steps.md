@@ -113,7 +113,7 @@ scp ~/Downloads/setup-relay.sh root@ADDRESS:/root/
 ssh root@ADDRESS 'bash /root/setup-relay.sh'
 ```
 
-**You verify:** ask for the last twenty lines. The installers print in Russian: `=== ВЫХОДНАЯ МАШИНА ГОТОВА ===` (exit ready) or `=== РЕЛЕЙ ГОТОВ ===` (relay ready) followed by the service list and, on the relay, `туннель работает` (tunnel works) with the exit's IP. Anything else → `troubleshooting.md`. Then `bash /usr/local/sbin/vpn-verify.sh` through them or over SSH.
+**You verify:** ask for the last twenty lines. The installers print `=== EXIT MACHINE READY ===` or `=== RELAY READY ===` followed by the service list and, on the relay, `tunnel works` with the exit's IP. Anything else → `troubleshooting.md`. Then `bash /usr/local/sbin/vpn-verify.sh` through them or over SSH.
 
 ---
 

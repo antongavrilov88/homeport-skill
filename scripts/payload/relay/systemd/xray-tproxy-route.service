@@ -1,5 +1,5 @@
 [Unit]
-Description=Маршрутизация и nftables для перехвата трафика клиентов в Xray
+Description=Routing and nftables for intercepting client traffic into Xray
 Before=xray.service
 After=network-online.target nftables.service wg-quick@wg-clients.service
 Wants=network-online.target

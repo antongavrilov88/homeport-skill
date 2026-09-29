@@ -1,5 +1,5 @@
 [Unit]
-Description=Сторож туннеля: проба, починка, откат на запасной путь, уведомления
+Description=Tunnel watchdog: probe, repair, failover to the fallback route, notifications
 After=network-online.target xray.service
 Wants=network-online.target
 
