@@ -1,5 +1,5 @@
 [Unit]
-Description=Учебное падение основного канала с проверкой автооткота
+Description=Drill: simulated outage of the main channel with an automatic failover check
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/vpn-drill.sh

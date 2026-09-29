@@ -1,5 +1,5 @@
 [Unit]
-Description=Приём WireGuard-клиентов ещё и на udp/443 (для сетей, режущих высокие порты)
+Description=Accept WireGuard clients on udp/443 as well (for networks that drop high ports)
 After=network-online.target nftables.service wg-quick@wg-clients.service
 Wants=network-online.target
 

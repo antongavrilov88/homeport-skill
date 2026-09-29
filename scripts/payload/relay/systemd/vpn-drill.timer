@@ -1,5 +1,5 @@
 [Unit]
-Description=Учения раз в месяц, ночью
+Description=Drill once a month, at night
 [Timer]
 OnCalendar=*-*-01 01:30:00
 RandomizedDelaySec=1800

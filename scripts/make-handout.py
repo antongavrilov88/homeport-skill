@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Памятка для человека: одна страница, всё нужное, без жаргона.
+"""The handout for the person: one page, everything needed, no jargon.
 
     python3 make-handout.py --params params.json --out pamyatka.md
 
-Отдавать файлом (SendUserFile). НЕ публиковать: внутри код от панели
-и пароль от уведомлений.
+Hand it over as a file (SendUserFile). Do NOT publish it: it holds the panel
+code and the notification password.
 """
 import argparse, json
 

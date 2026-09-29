@@ -12,7 +12,7 @@ You are setting up a personal VPN on a server the person rents, and you hand ove
 - These instructions are English. **Everything the person reads or hears is in their language** — the one they write to you in.
 - Ready-made wording for every human-facing moment is in `references/lang/en.md` and `references/lang/ru.md`, keyed by the same section numbers as `references/human-steps.md`. The Russian file is the wording tested with real families: use it verbatim. For any other language, translate from the English file as you go — the meaning and the warnings, never new steps.
 - The handout at the end: Russian → `scripts/make-handout.py` (its built-in text is the tested one). Any other language → fill `references/lang/handout-<xx>.md` yourself from `params.json` (`en` exists; the variables and the rules are at the top of the template).
-- The scripts print their console messages in Russian too (same reason). Where a line matters, it is quoted below; otherwise the exit code is your signal.
+- The scripts print their console messages in English. Where a line matters, it is quoted below; otherwise the exit code is your signal.
 - **The web panel and all push notifications (watchdog and drill) are in English**, whatever language the person speaks; name the buttons in English and explain them in the person's language. One exception: a server installed before 0.6.0 keeps the Russian panel and notifications until it is switched (`references/operations.md`, "Switch an existing server's panel to English"). The panel is opened a few times a year; the VPN itself needs no panel.
 
 ## Where you are running
@@ -87,7 +87,7 @@ export DO_TOKEN=...
 python3 scripts/provision-do.py check
 ```
 
-The script answers in Russian: `статус: active` is what you want; `аккаунт не активен` means the card is not attached — say so in words and go back to §1; do not try to create a machine. The first line, `аккаунт: <email>`, is the address to use for `--email` in the next step.
+`status: active` is what you want; `account not active` means the card is not attached — say so in words and go back to §1; do not try to create a machine. The first line, `account: <email>`, is the address to use for `--email` in the next step.
 
 Then, before anything is created, confirm the price you quoted:
 
@@ -110,7 +110,7 @@ python3 scripts/gen-secrets.py --domain <domain> --mode <single|relay> \
 ```
 
 - `--home-geoip` — **[relay] only**: the users' home country (`ru`, `ir`, `cn`, … any code Xray's GeoIP knows). Its addresses — banks, government sites — then leave the relay directly instead of through the tunnel, and stop complaining about a foreign address.
-- `--site-tagline` — the built-in default is Russian. Always pass one in the person's language; the cover site is rewritten in step 4 anyway.
+- `--site-tagline` — the built-in default is a generic English line. Always pass one in the person's language; the cover site is rewritten in step 4 anyway.
 - `--email` — the person's real address (the one `check` printed): certificate-expiry warnings go there. Without it they go to `admin@<domain>`, a mailbox that does not exist.
 
 `params.json` is the single source of truth from here on. **Never show its contents in the chat and never put it in a project or a shared page**: it holds the private key.
@@ -158,7 +158,7 @@ curl -sI https://<domain> | head -3    # from outside: 200 and a real certificat
 
 Do not continue until both agree. `curl` refuses a bad certificate, so `HTTP/2 200` there already proves the certificate is real. No certificate almost always means DNS — `references/troubleshooting.md`.
 
-**Take the alert token** from `/root/vpn-kit/exit-summary.txt` (the line `ntfy alerts-токен tk_…`) and write it into `params.json` as `ntfy_alert_token`. The exit's own watchdog already has it from this run; the relay build and any later rebuild take it from `params.json`, and without it they only reach the public fallback topic.
+**Take the alert token** from `/root/vpn-kit/exit-summary.txt` (the line `ntfy alerts token tk_…`) and write it into `params.json` as `ntfy_alert_token`. The exit's own watchdog already has it from this run; the relay build and any later rebuild take it from `params.json`, and without it they only reach the public fallback topic.
 
 **The cover site.** The template that landed in `/var/www/<domain>/` is a page of self-hosting notes, in Russian. Two things to do now, not "some day":
 

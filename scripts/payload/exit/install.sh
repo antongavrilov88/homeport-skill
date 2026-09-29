@@ -1,33 +1,33 @@
 #!/bin/bash
-# Установка выходной машины: VLESS + XHTTP + REALITY на 443, настоящий сайт под
-# тем же доменом (self-steal), сертификаты, ntfy для уведомлений.
-# При ROLE=single здесь же поднимается WireGuard для клиентов, дашборд и сторож.
+# Exit machine install: VLESS + XHTTP + REALITY on 443, a real site under the
+# same domain (self-steal), certificates, ntfy for notifications.
+# With ROLE=single this also brings up WireGuard for clients, the panel and the watchdog.
 set -euo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$KIT/vars.sh"
 export DEBIAN_FRONTEND=noninteractive
 log() { echo "[$(date +%H:%M:%S)] $*"; }
-die() { echo "ОШИБКА: $*" >&2; exit 1; }
+die() { echo "ERROR: $*" >&2; exit 1; }
 
-[ "$(id -u)" = 0 ] || die "запускать от root"
+[ "$(id -u)" = 0 ] || die "run as root"
 
-log "ставлю пакеты"
+log "installing packages"
 APT="apt-get -o DPkg::Lock::Timeout=600 -y -qq"
-for i in 1 2 3; do $APT update && break || { log "apt update не удался ($i), жду"; sleep 20; }; done
+for i in 1 2 3; do $APT update && break || { log "apt update failed ($i), waiting"; sleep 20; }; done
 PKGS="curl ca-certificates nginx certbot python3-certbot-nginx nftables jq unzip"
 [ "$ROLE" = "single" ] && PKGS="$PKGS wireguard-tools qrencode python3 iproute2"
 $APT install $PKGS
 
 # ---------------------------------------------------------------- Xray
 if ! command -v xray >/dev/null || ! xray version 2>/dev/null | grep -q "${XRAY_VERSION#v}"; then
-  log "ставлю Xray $XRAY_VERSION"
+  log "installing Xray $XRAY_VERSION"
   bash -c "$(curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" \
     @ install --version "${XRAY_VERSION#v}" >/dev/null
 fi
-command -v xray >/dev/null || die "Xray не установился"
+command -v xray >/dev/null || die "Xray did not install"
 
-# ---------------------------------------------------------------- сайт-прикрытие
-log "раскладываю сайт для $DOMAIN"
+# ---------------------------------------------------------------- cover site
+log "laying out the site for $DOMAIN"
 install -d -m755 "/var/www/$DOMAIN"
 sed -e "s|__SITE_TITLE__|$SITE_TITLE|g" \
     -e "s|__SITE_TAGLINE__|$SITE_TAGLINE|g" \
@@ -37,8 +37,8 @@ sed -e "s|__SITE_TITLE__|$SITE_TITLE|g" \
     -e "s|__DATE_3__|$(date -d '-74 days' +%d.%m.%Y 2>/dev/null || date +%d.%m.%Y)|g" \
     "$KIT/site/index.html" > "/var/www/$DOMAIN/index.html"
 
-# ---------------------------------------------------------------- nginx :80 + сертификаты
-log "nginx на 80 и сертификаты"
+# ---------------------------------------------------------------- nginx :80 + certificates
+log "nginx on 80 and certificates"
 rm -f /etc/nginx/sites-enabled/default
 cat > "/etc/nginx/sites-available/$DOMAIN-http" <<EOF
 server {
@@ -50,30 +50,32 @@ server {
 }
 EOF
 ln -sf "/etc/nginx/sites-available/$DOMAIN-http" "/etc/nginx/sites-enabled/$DOMAIN-http"
-nginx -t || die "конфиг nginx не проходит проверку"
+nginx -t || die "nginx config fails its check"
 systemctl reload nginx
 
 certbot_for() {
   local d="$1"
-  [ -d "/etc/letsencrypt/live/$d" ] && { log "сертификат для $d уже есть"; return 0; }
+  [ -d "/etc/letsencrypt/live/$d" ] && { log "certificate for $d already exists"; return 0; }
   for attempt in 1 2 3 4 5 6; do
     if certbot certonly --webroot -w "/var/www/$DOMAIN" -d "$d" \
          --non-interactive --agree-tos -m "$ACME_EMAIL" >/dev/null 2>&1; then
-      log "сертификат для $d получен"; return 0
+      log "certificate for $d obtained"; return 0
     fi
-    log "сертификат для $d не вышел (попытка $attempt) — жду DNS, 60 с"
+    log "certificate for $d failed (attempt $attempt), waiting for DNS, 60 s"
     sleep 60
   done
   return 1
 }
-certbot_for "$DOMAIN" || die "не удалось получить сертификат для $DOMAIN. Проверь, что A-запись $DOMAIN указывает на этот сервер, и запусти скрипт ещё раз."
+certbot_for "$DOMAIN" || die "could not obtain a certificate for $DOMAIN. Check that the A record of $DOMAIN points at this server and run the script again."
 PUSH_OK=0
-if [ -n "${PUSH_DOMAIN:-}" ]; then certbot_for "$PUSH_DOMAIN" && PUSH_OK=1 || log "ntfy-домен без сертификата — уведомления пойдут через запасной публичный ntfy"; fi
+# The public ntfy.sh topic is not a fallback: every alert goes there in any case,
+# alongside the own ntfy. Without a certificate the own ntfy is simply not set up.
+if [ -n "${PUSH_DOMAIN:-}" ]; then certbot_for "$PUSH_DOMAIN" && PUSH_OK=1 || log "no certificate for the ntfy domain, no own ntfy server: alerts go to the public ntfy.sh topic only"; fi
 
-# ---------------------------------------------------------------- nginx :8443 (цель self-steal)
+# ---------------------------------------------------------------- nginx :8443 (self-steal target)
 cat > "/etc/nginx/sites-available/$DOMAIN-https" <<EOF
 server {
-    # сюда попадает только активное зондирование через REALITY и локальные запросы
+    # only active probing through REALITY and local requests land here
     listen 127.0.0.1:8443 ssl;
     http2 on;
     server_name $DOMAIN;
@@ -90,7 +92,7 @@ ln -sf "/etc/nginx/sites-available/$DOMAIN-https" "/etc/nginx/sites-enabled/$DOM
 # ---------------------------------------------------------------- ntfy
 NTFY_OK=0
 if [ "$PUSH_OK" = 1 ] && [ -n "${NTFY_VERSION:-}" ]; then
-  log "ставлю ntfy $NTFY_VERSION"
+  log "installing ntfy $NTFY_VERSION"
   ARCH=$(dpkg --print-architecture)
   if curl -fsSL -o /tmp/ntfy.deb \
       "https://github.com/binwiederhier/ntfy/releases/download/${NTFY_VERSION}/ntfy_${NTFY_VERSION#v}_linux_${ARCH}.deb"; then
@@ -103,8 +105,9 @@ cache-file: "/var/lib/ntfy/cache.db"
 auth-file: "/var/lib/ntfy/user.db"
 auth-default-access: "deny-all"
 behind-proxy: true
-# iOS keeps no background connection; only ntfy.sh can wake the phone. Only
-# "new message" goes upstream — no text, no topic; the phone fetches the text here.
+# iOS keeps no background connection; only ntfy.sh can wake the phone. The wake-up
+# goes upstream as a message ID under a hashed topic name, no title, no text; the
+# phone then fetches the alert from this server.
 upstream-base-url: "https://ntfy.sh"
 EOF
     chown -R ntfy:ntfy /var/lib/ntfy 2>/dev/null || true
@@ -148,14 +151,14 @@ EOF
     ln -sf "/etc/nginx/sites-available/$PUSH_DOMAIN-https" "/etc/nginx/sites-enabled/$PUSH_DOMAIN-https"
     NTFY_OK=1
   else
-    log "не смог скачать ntfy — уведомления пойдут через публичный ntfy.sh"
+    log "could not download ntfy, no own ntfy server: alerts go to the public ntfy.sh topic only"
   fi
 fi
-nginx -t || die "конфиг nginx не проходит проверку"
+nginx -t || die "nginx config fails its check"
 systemctl reload nginx
 
 # ---------------------------------------------------------------- Xray: inbound REALITY
-log "конфигурирую Xray"
+log "configuring Xray"
 install -d -m755 /usr/local/etc/xray
 python3 - <<PY
 import json
@@ -181,22 +184,22 @@ cfg = {
               "rules": [{"type": "field", "ip": ["geoip:private"], "outboundTag": "block"}]}
 }
 if "$ROLE" == "single":
-    # локальный socks: через него сторож проверяет, что машина вообще в сети
+    # local socks: through it the watchdog probes that the machine is online at all
     cfg["inbounds"].append({"tag": "socks-test", "listen": "127.0.0.1", "port": 1080,
                             "protocol": "socks", "settings": {"udp": True}})
     cfg["routing"]["rules"].append({"type": "field", "inboundTag": ["socks-test"],
                                     "outboundTag": "direct"})
 json.dump(cfg, open("/usr/local/etc/xray/config.json", "w"), indent=2)
 PY
-# В конфиге лежит приватный ключ REALITY. Xray бежит от nobody, поэтому 640
-# с группой, а не 644: прочие локальные процессы читать его не должны.
+# The config holds the REALITY private key. Xray runs as nobody, hence 640 with
+# the group rather than 644: other local processes must not be able to read it.
 chgrp nogroup /usr/local/etc/xray/config.json 2>/dev/null || true
 chmod 640 /usr/local/etc/xray/config.json
-xray run -test -c /usr/local/etc/xray/config.json >/dev/null || die "конфиг Xray не проходит проверку"
+xray run -test -c /usr/local/etc/xray/config.json >/dev/null || die "Xray config fails its check"
 systemctl enable --now xray >/dev/null 2>&1
 systemctl restart xray
 
-# ---------------------------------------------------------------- обновление сертификатов
+# ---------------------------------------------------------------- certificate renewal
 install -d -m755 /etc/letsencrypt/renewal-hooks/deploy
 cat > /etc/letsencrypt/renewal-hooks/deploy/reload.sh <<'EOF'
 #!/bin/sh
@@ -205,10 +208,10 @@ EOF
 chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload.sh
 systemctl enable --now certbot.timer >/dev/null 2>&1 || true
 
-# ---------------------------------------------------------------- фаервол
-log "фаервол"
-# Своя таблица, без flush ruleset: таблицы vpnnat и wgports живут отдельно
-# и не должны исчезать при перезагрузке фаервола.
+# ---------------------------------------------------------------- firewall
+log "firewall"
+# Own table, no flush ruleset: the vpnnat and wgports tables live separately
+# and must not vanish when the firewall is reloaded.
 cat > /etc/nftables.conf <<EOF
 #!/usr/sbin/nft -f
 table inet filter
@@ -231,34 +234,34 @@ EOF
 nft -f /etc/nftables.conf
 systemctl enable --now nftables >/dev/null 2>&1 || true
 
-# ---------------------------------------------------------------- проверялка
+# ---------------------------------------------------------------- verify script
 install -d -m755 /etc/vpn-monitor /usr/local/sbin
 install -m755 "$KIT/common/verify.sh" /usr/local/sbin/vpn-verify.sh
 [ -f /etc/vpn-monitor/config.sh ] || printf 'VPN_MODE=exit\n' > /etc/vpn-monitor/config.sh
 
-# ---------------------------------------------------------------- одна машина: клиентская часть
+# ---------------------------------------------------------------- one machine: client side
 if [ "$ROLE" = "single" ]; then
-  log "поднимаю WireGuard для клиентов"
+  log "bringing up WireGuard for clients"
   bash "$KIT/common/install-clientside.sh"
   systemctl restart vpn-watchdog
 fi
 
-# ---------------------------------------------------------------- итог
+# ---------------------------------------------------------------- summary
 install -d -m700 /root/vpn-kit
 cat > /root/vpn-kit/exit-summary.txt <<EOF
-домен            $DOMAIN
-push-домен       ${PUSH_DOMAIN:-(нет)}  ntfy: $([ "$NTFY_OK" = 1 ] && echo "свой, тема $NTFY_TOPIC" || echo "публичный ntfy.sh")
-ntfy alerts-токен ${ALERT_TOKEN:-(нет)}
-uuid реле        $UUID_RELAY
-uuid прямой      ${UUID_DIRECT:-(нет)}
+domain           $DOMAIN
+push domain      ${PUSH_DOMAIN:-(none)}  ntfy: $([ "$NTFY_OK" = 1 ] && echo "own server, topic $NTFY_TOPIC" || echo "public ntfy.sh only")
+ntfy alerts token ${ALERT_TOKEN:-(none)}
+uuid relay       $UUID_RELAY
+uuid direct      ${UUID_DIRECT:-(none)}
 reality pubkey   $REALITY_PUBLIC
-shortId реле     $SHORT_RELAY
-shortId прямой   ${SHORT_DIRECT:-(нет)}
+shortId relay    $SHORT_RELAY
+shortId direct   ${SHORT_DIRECT:-(none)}
 xhttp path       $XHTTP_PATH
 EOF
 chmod 600 /root/vpn-kit/exit-summary.txt
 echo
-echo "=== ВЫХОДНАЯ МАШИНА ГОТОВА ==="
+echo "=== EXIT MACHINE READY ==="
 systemctl is-active xray nginx 2>/dev/null | tr '\n' ' ' || true; echo
 echo "ntfy-alerts-token: ${ALERT_TOKEN:-none}"
-echo "сводка: /root/vpn-kit/exit-summary.txt"
+echo "summary: /root/vpn-kit/exit-summary.txt"

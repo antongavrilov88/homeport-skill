@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Создание и обслуживание машин в DigitalOcean через API.
+"""Creates and maintains machines in DigitalOcean through the API.
 
-Токен берётся из переменной окружения DO_TOKEN.
+The token is read from the DO_TOKEN environment variable.
 
     python3 provision-do.py check
     python3 provision-do.py keys
@@ -16,8 +16,8 @@
     python3 provision-do.py ns-check --domain example.com
     python3 provision-do.py destroy --id 123456789 --tag vpn-exit
 
-Осторожно: destroy требует и id, и тег — и удаляет машину, только если она
-действительно помечена этим тегом. Это защита от сноса чужого дроплета.
+Careful: destroy needs both the id and the tag, and deletes the machine only if
+it really carries that tag. This protects someone else's droplet from being torn down.
 """
 import argparse, json, os, shutil, socket, subprocess, sys, time
 import urllib.error, urllib.parse, urllib.request
@@ -28,7 +28,7 @@ API = "https://api.digitalocean.com/v2"
 def token():
     t = os.environ.get("DO_TOKEN", "").strip()
     if not t:
-        sys.exit("нет DO_TOKEN в окружении")
+        sys.exit("no DO_TOKEN in the environment")
     return t
 
 
@@ -45,10 +45,10 @@ def call(method, path, body=None, quiet=False):
         detail = e.read().decode("utf-8", "replace")[:400]
         if quiet:
             return {"_error": e.code, "_detail": detail}
-        sys.exit(f"DigitalOcean вернул {e.code}: {detail}")
+        sys.exit(f"DigitalOcean returned {e.code}: {detail}")
     except urllib.error.URLError as e:
-        sys.exit(f"не достучался до api.digitalocean.com: {e.reason}. "
-                 "Если сеть закрыта, эти же шаги можно сделать руками — см. references/provisioning.md")
+        sys.exit(f"could not reach api.digitalocean.com: {e.reason}. "
+                 "If the network is closed, the same steps can be done by hand: see references/provisioning.md")
 
 
 def cmd_keys(a):
@@ -89,23 +89,23 @@ def cmd_price(a):
 def cmd_create(a):
     existing = call("GET", f"/droplets?tag_name={a.tag}").get("droplets", [])
     if existing and not a.force:
-        print("С этим тегом уже есть машины — разберись с ними, прежде чем создавать новую:")
+        print("Machines with this tag already exist; deal with them before creating a new one:")
         for d in existing:
             ip = next((n["ip_address"] for n in d["networks"]["v4"] if n["type"] == "public"), "")
             print(f'  {d["id"]}  {d["name"]}  {d["status"]}  {ip}')
-        sys.exit("остановился намеренно (--force чтобы всё равно создать)")
+        sys.exit("stopped on purpose (--force to create anyway)")
     if not a.ssh_key:
-        sys.exit("нужен --ssh-key: без него DigitalOcean включит вход по паролю и не пустит по ключу")
+        sys.exit("--ssh-key is required: without it DigitalOcean enables password login and refuses key login")
     user_data = open(a.user_data, encoding="utf-8").read() if a.user_data else None
     if user_data and len(user_data.encode()) > 63 * 1024:
-        sys.exit("user-data больше 63 КБ — DigitalOcean не примет. Ставь скрипт по SSH вручную.")
+        sys.exit("user-data is over 63 KB; DigitalOcean will not accept it. Install the script over SSH by hand.")
     body = {"name": a.name, "region": a.region, "size": a.size, "image": a.image,
             "ssh_keys": [int(k) if k.isdigit() else k for k in a.ssh_key],
             "tags": [a.tag], "monitoring": True, "backups": False, "ipv6": True}
     if user_data:
         body["user_data"] = user_data
     d = call("POST", "/droplets", body)["droplet"]
-    print(f'создан id={d["id"]}, жду адрес', file=sys.stderr)
+    print(f'created id={d["id"]}, waiting for the address', file=sys.stderr)
     for _ in range(60):
         time.sleep(10)
         cur = call("GET", f'/droplets/{d["id"]}')["droplet"]
@@ -113,14 +113,14 @@ def cmd_create(a):
         if cur["status"] == "active" and ip:
             print(json.dumps({"id": cur["id"], "ip": ip, "name": cur["name"]}))
             return
-    sys.exit("машина не поднялась за 10 минут")
+    sys.exit("the machine did not come up within 10 minutes")
 
 
 def cmd_dns(a):
     have = call("GET", f"/domains/{a.domain}", quiet=True)
     if have.get("_error") == 404:
         call("POST", "/domains", {"name": a.domain, "ip_address": a.ip})
-        print(f"домен {a.domain} заведён в DNS DigitalOcean", file=sys.stderr)
+        print(f"domain {a.domain} added to DigitalOcean DNS", file=sys.stderr)
     recs = call("GET", f"/domains/{a.domain}/records?per_page=200").get("domain_records", [])
     for name in a.names:
         cur = [r for r in recs if r["type"] == "A" and r["name"] == name]
@@ -128,36 +128,36 @@ def cmd_dns(a):
             for r in cur[1:]:
                 call("DELETE", f'/domains/{a.domain}/records/{r["id"]}')
             call("PUT", f'/domains/{a.domain}/records/{cur[0]["id"]}', {"data": a.ip, "ttl": 300})
-            print(f"обновил A {name} -> {a.ip}")
+            print(f"updated A {name} -> {a.ip}")
         else:
             call("POST", f"/domains/{a.domain}/records",
                  {"type": "A", "name": name, "data": a.ip, "ttl": 300})
-            print(f"создал A {name} -> {a.ip}")
+            print(f"created A {name} -> {a.ip}")
 
 
 
 
 def cmd_check(a):
-    """Токен рабочий? Деньги есть? Спросить один раз, до того как что-то создавать."""
+    """Does the token work? Is there money? Ask once, before creating anything."""
     acc = call("GET", "/account").get("account", {})
-    print(f'аккаунт: {acc.get("email","?")}  статус: {acc.get("status","?")}')
+    print(f'account: {acc.get("email","?")}  status: {acc.get("status","?")}')
     if acc.get("status") != "active":
-        print("ВНИМАНИЕ: аккаунт не активен — скорее всего не привязан способ оплаты")
+        print("WARNING: account not active, most likely no payment method attached")
     lim = acc.get("droplet_limit")
     if lim is not None:
-        print(f"лимит машин: {lim}")
+        print(f"machine limit: {lim}")
     bal = call("GET", "/customers/my/balance", quiet=True)
     if "_error" not in bal:
-        print(f'баланс: {bal.get("account_balance","?")}  к оплате в этом месяце: {bal.get("month_to_date_usage","?")}')
+        print(f'balance: {bal.get("account_balance","?")}  due this month: {bal.get("month_to_date_usage","?")}')
     n = len(call("GET", "/droplets?per_page=200").get("droplets", []))
-    print(f"машин на аккаунте сейчас: {n}")
+    print(f"machines on the account now: {n}")
 
 
 def cmd_new_key(a):
-    """Сгенерировать SSH-ключ и залить публичную часть в DigitalOcean.
+    """Generate an SSH key and upload the public part to DigitalOcean.
 
-    Нужен, чтобы человеку не пришлось возиться с ключами руками: приватная
-    часть остаётся у него на диске, публичная уезжает в аккаунт.
+    Exists so the person never has to handle keys by hand: the private part
+    stays on their disk, the public part goes to the account.
     """
     path = os.path.expanduser(a.out)
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
@@ -165,7 +165,7 @@ def cmd_new_key(a):
         r = subprocess.run(["ssh-keygen", "-t", "ed25519", "-N", "", "-C", a.name, "-f", path],
                            capture_output=True, text=True)
         if r.returncode != 0:
-            sys.exit("не смог создать ключ: " + (r.stderr or r.stdout)[:300])
+            sys.exit("could not create the key: " + (r.stderr or r.stdout)[:300])
         os.chmod(path, 0o600)
     pub = open(path + ".pub", encoding="utf-8").read().strip()
     have = call("GET", "/account/keys?per_page=200").get("ssh_keys", [])
@@ -181,10 +181,10 @@ DOH = ["https://cloudflare-dns.com/dns-query", "https://dns.google/resolve"]
 
 
 def _resolve(name, rtype="A"):
-    """Спросить DNS. Сначала локальным резолвером, потом через HTTPS.
+    """Ask DNS. First the local resolver, then over HTTPS.
 
-    Возвращает (список значений, текст ошибки). Пустой список без ошибки —
-    записи действительно нет.
+    Returns (list of values, error text). An empty list with no error means
+    the record really does not exist.
     """
     for tool, args in (("dig", ["+short", "+time=3", "+tries=2", rtype, name]),
                        ("nslookup", ["-type=" + rtype, name])):
@@ -220,46 +220,46 @@ def _resolve(name, rtype="A"):
             continue
         return [x.get("data", "").rstrip(".") for x in data.get("Answer", [])
                 if x.get("type") in (1, 2)], None
-    return None, last or "нет доступа к DNS"
+    return None, last or "no access to DNS"
 
 
 def cmd_dns_check(a):
-    """Разошлись ли A-записи. Проверять самому, а не спрашивать человека."""
+    """Have the A records propagated. Check it yourself instead of asking the person."""
     bad = []
     for name in a.names:
         fqdn = a.domain if name in ("@", "") else f"{name}.{a.domain}"
         got, err = _resolve(fqdn, "A")
         if err:
-            print(f"{fqdn}: не смог спросить DNS ({err}).")
-            print("     Проверить можно так: открыть https://dnschecker.org и вбить туда адрес.")
+            print(f"{fqdn}: could not ask DNS ({err}).")
+            print("     To check by hand: open https://dnschecker.org and enter the name there.")
             bad.append(fqdn)
         elif not got:
-            print(f"{fqdn}: записи пока нет")
+            print(f"{fqdn}: no record yet")
             bad.append(fqdn)
         elif a.ip and a.ip not in got:
-            print(f"{fqdn}: {', '.join(got)} — а нужен {a.ip}")
+            print(f"{fqdn}: {', '.join(got)} — but {a.ip} is needed")
             bad.append(fqdn)
         else:
-            print(f"{fqdn}: {', '.join(got)} — верно")
+            print(f"{fqdn}: {', '.join(got)} — correct")
     sys.exit(1 if bad else 0)
 
 
 def cmd_ns_check(a):
-    """Куда делегирован домен: в DigitalOcean или к регистратору."""
+    """Where the domain is delegated: to DigitalOcean or to the registrar."""
     got, err = _resolve(a.domain, "NS")
     if err:
-        print(f"не смог спросить DNS: {err}")
-        print("Посмотреть вручную: https://dnschecker.org, тип записи NS.")
+        print(f"could not ask DNS: {err}")
+        print("To look by hand: https://dnschecker.org, record type NS.")
         sys.exit(3)
     if not got:
-        print(f"у {a.domain} не выставлены NS-серверы — домен ещё никуда не делегирован")
+        print(f"{a.domain} has no NS servers set: the domain is not delegated anywhere yet")
         sys.exit(1)
     do = [g for g in got if "digitalocean" in g.lower()]
     print("NS: " + ", ".join(sorted(got)))
     if do:
-        print("делегирован в DigitalOcean — A-записи можно ставить отсюда")
+        print("delegated to DigitalOcean: A records can be set from here")
         sys.exit(0)
-    print("делегирован НЕ в DigitalOcean — A-записи придётся ставить у регистратора")
+    print("NOT delegated to DigitalOcean: A records have to be set at the registrar")
     sys.exit(2)
 
 
@@ -268,19 +268,19 @@ def cmd_wait_ssh(a):
     while time.time() < deadline:
         try:
             with socket.create_connection((a.ip, 22), timeout=5):
-                print("ssh отвечает")
+                print("ssh answers")
                 return
         except OSError:
             time.sleep(5)
-    sys.exit(f"{a.ip}:22 не отвечает за {a.timeout} с")
+    sys.exit(f"{a.ip}:22 did not answer within {a.timeout} s")
 
 
 def cmd_destroy(a):
     d = call("GET", f"/droplets/{a.id}")["droplet"]
     if a.tag not in d.get("tags", []):
-        sys.exit(f'машина {a.id} ({d["name"]}) не помечена тегом {a.tag} — удалять не буду')
+        sys.exit(f'machine {a.id} ({d["name"]}) does not carry the tag {a.tag}; not deleting')
     call("DELETE", f"/droplets/{a.id}")
-    print(f'удалил {a.id} ({d["name"]})')
+    print(f'deleted {a.id} ({d["name"]})')
 
 
 def main():

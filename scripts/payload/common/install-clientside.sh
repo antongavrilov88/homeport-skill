@@ -1,29 +1,29 @@
 #!/bin/bash
-# Клиентская часть: WireGuard для устройств, дашборд, сторож.
-# Используется и на релее (ROLE=relay), и на единственной машине (ROLE=single).
+# Client side: WireGuard for devices, the panel, the watchdog.
+# Used both on the relay (ROLE=relay) and on the only machine (ROLE=single).
 set -euo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$KIT/vars.sh"
 log() { echo "[$(date +%H:%M:%S)] $*"; }
 GW="$WG_SUBNET.1"
 WAN=$(ip -o -4 route show to default | awk '{for(i=1;i<NF;i++) if($i=="dev"){print $(i+1); exit}}')
-[ -n "$WAN" ] || { echo "не нашёл внешний интерфейс" >&2; exit 1; }
+[ -n "$WAN" ] || { echo "no external interface found" >&2; exit 1; }
 
-# Адрес, который клиенты пишут в Endpoint. Если сборка шла до того, как стал
-# известен IP машины, определяем его здесь — иначе все выданные конфиги мёртвые.
+# The address clients put into Endpoint. If the build ran before the machine's IP
+# was known, detect it here; otherwise every issued config is dead.
 if [ -z "${CLIENT_ENDPOINT:-}" ]; then
   CLIENT_ENDPOINT=$(curl -s -m 10 https://api.ipify.org 2>/dev/null || true)
   [ -n "$CLIENT_ENDPOINT" ] || CLIENT_ENDPOINT=$(ip -o -4 addr show dev "$WAN" scope global | awk '{print $4}' | cut -d/ -f1 | head -1)
-  log "адрес для клиентов определён автоматически: $CLIENT_ENDPOINT"
+  log "client endpoint address detected automatically: $CLIENT_ENDPOINT"
 fi
-[ -n "$CLIENT_ENDPOINT" ] || { echo "не смог определить публичный адрес — впиши client_endpoint в params.json" >&2; exit 1; }
+[ -n "$CLIENT_ENDPOINT" ] || { echo "could not detect the public address: put client_endpoint into params.json" >&2; exit 1; }
 
 command -v wg >/dev/null || { export DEBIAN_FRONTEND=noninteractive; apt-get install -y -qq wireguard-tools qrencode; }
 
 # ---------------------------------------------------------------- WireGuard
 install -d -m700 /etc/wireguard
 if [ ! -f /etc/wireguard/wg-clients.conf ]; then
-  log "создаю wg-clients"
+  log "creating wg-clients"
   SRV_PRIV=$(wg genkey)
   umask 077
   printf '%s\n' "$SRV_PRIV" > /etc/wireguard/wg-clients.private
@@ -42,16 +42,16 @@ PostDown = nft delete table ip vpnnat 2>/dev/null || true
 EOF
   chmod 600 /etc/wireguard/wg-clients.conf
 else
-  log "wg-clients уже есть, не трогаю"
+  log "wg-clients already exists, leaving it alone"
 fi
 systemctl enable --now wg-quick@wg-clients >/dev/null 2>&1 || systemctl restart wg-quick@wg-clients
 
-# ---------------------------------------------------------------- udp/443 для строгих сетей
+# ---------------------------------------------------------------- udp/443 for strict networks
 install -d -m755 /etc/xray
 cat > /etc/xray/wgports.nft <<EOF
 #!/usr/sbin/nft -f
-# Принимать WireGuard-клиентов ещё и на udp/443: некоторые сети (отели, мобильные
-# операторы) пропускают только 443 и режут высокие UDP-порты.
+# Accept WireGuard clients on udp/443 as well: some networks (hotels, mobile
+# carriers) let only 443 through and drop high UDP ports.
 table ip wgports
 delete table ip wgports
 table ip wgports {
@@ -66,8 +66,8 @@ install -m644 "$KIT/common/systemd/vpn-wgports.service" /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable vpn-wgports >/dev/null 2>&1 || true
 
-# ---------------------------------------------------------------- файлы монитора
-log "ставлю монитор, дашборд и сторож"
+# ---------------------------------------------------------------- monitor files
+log "installing the monitor, the panel and the watchdog"
 install -d -m755 /usr/local/sbin /usr/local/share/vpn-monitor /etc/vpn-monitor
 install -d -m750 /var/lib/vpn-monitor
 install -m755 "$KIT/common/vpn-monitor.py"  /usr/local/sbin/vpn-monitor.py
@@ -123,12 +123,12 @@ if [ "$ROLE" != "single" ] && [ ! -f /etc/vpn-monitor/direct-domains.txt ]; then
   install -m644 "$KIT/relay/direct-domains.txt" /etc/vpn-monitor/direct-domains.txt
 fi
 
-# ---------------------------------------------------------------- юниты
+# ---------------------------------------------------------------- units
 install -m644 "$KIT/common/systemd/vpn-monitor.service"  /etc/systemd/system/
 install -m644 "$KIT/common/systemd/vpn-watchdog.service" /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable vpn-monitor vpn-watchdog >/dev/null 2>&1
 systemctl restart vpn-monitor
-# сторож запускает вызывающий установщик — после того, как Xray поднят,
-# иначе первая же проба уходит в ложную тревогу прямо во время установки
-log "клиентская часть готова: дашборд http://$GW:$DASH_PORT"
+# the calling installer starts the watchdog, after Xray is up; otherwise the
+# very first probe raises a false alarm in the middle of the install
+log "client side ready: panel http://$GW:$DASH_PORT"

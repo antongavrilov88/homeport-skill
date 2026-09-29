@@ -5,7 +5,7 @@ snapshot with `sudo /usr/local/sbin/vpn-diag.sh` (it prints the path to the file
 
 ## The certificate is not being issued
 
-Symptom: the installer prints `сертификат для … не вышел` ("certificate for … failed" — the installers log in Russian) six times and exits.
+Symptom: the installer prints `certificate for … failed` six times and exits.
 
 Almost always DNS. Check:
 
@@ -25,7 +25,7 @@ dig +short A push.<domain> @1.1.1.1
 Without a certificate REALITY is useless: active probing gets a TLS error instead
 of a real site, and that stands out more than having no VPN at all.
 
-## The install is stuck on apt (`жду` lines in the log)
+## The install is stuck on apt (`waiting` lines in the log)
 
 Cloud-init on a fresh machine competes with unattended upgrades. The installer
 waits up to five minutes and then moves on. If it hangs longer than that:

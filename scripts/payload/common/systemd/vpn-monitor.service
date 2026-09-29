@@ -1,5 +1,5 @@
 [Unit]
-Description=VPN monitor: счётчики байт по пирам и панель управления
+Description=VPN monitor: per-peer byte counters and the web panel
 After=network-online.target wg-quick@wg-clients.service
 Wants=network-online.target
 

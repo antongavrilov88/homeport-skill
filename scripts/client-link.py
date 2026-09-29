@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Ссылка vless:// для приложений (Hiddify, v2rayNG, Streisand, NekoBox).
+"""A vless:// link for apps (Hiddify, v2rayNG, Streisand, NekoBox).
 
-    python3 client-link.py --params params.json [--label дом] [--qr link.png]
+    python3 client-link.py --params params.json [--label home] [--qr link.png]
 
-Такой клиент ходит напрямую на выходную машину, минуя релей. Это личный
-запасной вход для того, кто держит систему: работает, даже когда релей лёг.
+Such a client goes straight to the exit machine, bypassing the relay. It is the
+personal spare entry for whoever runs the system: it works even while the relay is down.
 """
 import argparse, json, subprocess, sys, urllib.parse
 
@@ -17,7 +17,7 @@ def main():
     a = ap.parse_args()
     p = json.load(open(a.params, encoding="utf-8"))
     if not p.get("exit_ip"):
-        sys.exit("в params.json ещё нет exit_ip — сначала подними выходную машину")
+        sys.exit("params.json has no exit_ip yet: bring up the exit machine first")
     q = urllib.parse.urlencode({
         "encryption": "none", "security": "reality", "sni": p["domain"], "fp": "chrome",
         "pbk": p["reality_public"], "sid": p["short_direct"], "type": "xhttp",
@@ -31,7 +31,7 @@ def main():
                            input=link.encode(), check=True)
             print(f"QR: {a.qr}", file=sys.stderr)
         except (OSError, subprocess.CalledProcessError):
-            print("qrencode не установлен — ссылку можно вставить руками", file=sys.stderr)
+            print("qrencode is not installed; the link can be pasted by hand", file=sys.stderr)
 
 
 if __name__ == "__main__":
