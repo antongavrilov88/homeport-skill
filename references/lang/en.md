@@ -44,6 +44,8 @@ Money — one paragraph, no confirmation asked. `<price>` is the monthly price t
 
 Why, said to them: "We need a computer abroad that runs around the clock. We'll rent it from DigitalOcean — it's like web hosting, except you get the whole server. <price> a month before tax — the price we just went over."
 
+Whose it is: "The server will be yours: Homeport can't switch it off or look inside it, and your card goes straight to DigitalOcean, never to Homeport."
+
 The steps, one at a time: "Open cloud.digitalocean.com/registrations/new." → "Sign up with an email and a password, or with Google." → "Confirm the email — there's a letter with a link." → "Add a payment method."
 
 The card: "About a dollar will be charged to check the card and refunded straight away."
@@ -56,6 +58,8 @@ Never: suggest an account in someone else's name, or a way around the card check
 
 "So that I can do everything for you, I need a key to your account. It's a long line of text. It gives full access, which is why we'll revoke it right after the setup — and then it's useless."
 
+What it's for: "It lets me rent one server for you, in your own account, and we revoke it together at the end."
+
 The steps: "Open cloud.digitalocean.com." → "In the left menu, at the bottom: API." → "The Tokens tab, the button Generate New Token." → "Name: `vpn`, or anything." → "Expiration: 30 days." → "Scopes: Full Access." → "Generate Token." → "The line starting `dop_v1_` is shown once. Copy it whole and paste it here."
 
 Must be said aloud: "This line will pass through our conversation. When we're done, we'll revoke it and, if needed, issue a new one — so even if this chat leaked somewhere one day, the key is already dead."
@@ -67,6 +71,8 @@ Revoking later: "The same page: API → Tokens → the three dots next to the to
 "We need an address of your own on the internet, like `ivanov-notes.com`. About ten dollars a year. It's for the disguise: whoever looks from the outside sees you simply visiting some website."
 
 Where: "Namecheap, Porkbun or Cloudflare — cheap, paid by card. Or the registrar you already use."
+
+Whose it is: "It will be registered to you, so only you can renew or move it; keep it apart from anything personal: it's the disguise."
 
 What to pick: "Any free name. `.com`, `.net`, `.org`, `.me` are all fine. Skip the very cheap ones — `.xyz`, `.top`, `.click` — they get blocked in bulk."
 
@@ -132,6 +138,8 @@ Adding a device: "In the app tap +, choose 'Create from QR code', point the came
 
 On a computer: "Instead of a QR the panel gives you a `.conf` file; in the app choose 'Import tunnel(s) from file'."
 
+One key per device: "Each device gets its own key, made on your server: if a phone is lost, delete that one device in the panel, and the others keep working."
+
 The system prompt: "The phone will ask once whether to allow this VPN to be set up. That's the normal system question — say yes."
 
 The first device, before you send its code: "The very first device I set up from the server and send you the code for, because the panel only opens from inside the VPN and nothing is inside it yet. This one code passed through our chat; once you're connected you can make a fresh one in the panel and delete this one, if you like. From the second device on, you do it yourself in the panel, with me watching."
@@ -157,6 +165,8 @@ The panel is in English. The buttons the person needs (full list at the end of t
 Then: "I've just sent a test — did it arrive?"
 
 ## §10 Cleaning up (a day or two later, one message)
+
+Why, said to them: "Once the key is revoked, nothing from this conversation can touch your account again."
 
 - revoke the access key (§2, "revoking later");
 - delete the server password and the key from the conversation, if they were sent here;
