@@ -106,6 +106,18 @@ What you need afterwards: "The server's address, the login (usually `root`) and 
 
 Say it straight: "This server's password will also pass through our conversation. After the install I'll show you how to change it — it's one command."
 
+The address check, before the install — about two minutes. Why: "Before we set anything up, let's check that their phones can reach this server at all. Some mobile networks only let certain addresses through, and swapping the address now is easy — after every phone is set up, it isn't."
+
+The test rule, if their panel has a firewall or a security group: "Add one more rule next to the others: incoming, TCP, port 80. It's only for this test — we'll delete it in a few minutes."
+
+The test: "Take a phone that's on the family's mobile network — yours if you're there, or ask one of them. Turn Wi-Fi off, so it's on mobile data. Open this link: http://<relay address> — does it say 'It works'?" If the family is on more than one mobile network: "One phone on each network, please — they don't all let the same addresses through." If the phone warns that the page isn't secure: "That's expected for this test page — go on to the page."
+
+If it says "It works" and the address isn't static yet: "Good — their network lets this address through. Now a couple of clicks to make it permanent, so it never changes: in their panel that's called a static or reserved address. I'll tell you exactly where."
+
+If it doesn't open: "That's not something you did: this network doesn't let this particular address through. We'll take another address and try again — a couple of minutes." After two or three: "This provider's addresses don't get through on their network. Let's try another provider in the same country — better to find out now than after everyone's phones are set up."
+
+Afterwards: "Test done — you can delete the port 80 rule now." If they ask whether that settles it: "It shows their phones can reach the server. The real test comes after the setup, on the first phone."
+
 ## §7 Running one command on the server
 
 "I'll send you a file and two lines. You open one program on your computer and paste them in. It takes a minute, and then the server sets itself up in about ten."
