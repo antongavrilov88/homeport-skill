@@ -64,7 +64,7 @@ When the login is not root (Yandex Cloud, some others): `scp … <user>@<IP>:~/`
 
 **2. Through cloud-init**, if the machine does not exist yet: the whole `setup-exit.sh` goes into the user-data field at creation. **Exit only, never the relay** — metadata is readable by any local process on the machine.
 
-**3. Hand the file to the person.** Send `setup-*.sh` with SendUserFile and walk them through `human-steps.md` §7 with the words from `lang/en.md` §7 — how to open a terminal on each system, that the password does not show while typing, what to answer to the `yes/no` question. The lines themselves:
+**3. Hand the file to the person.** Send `setup-*.sh` as a file, with your environment's way of handing over a file, and walk them through `human-steps.md` §7 with the words from `lang/en.md` §7 — how to open a terminal on each system, that the password does not show while typing, what to answer to the `yes/no` question. The lines themselves:
 
 ```bash
 scp ~/Downloads/setup-relay.sh root@<IP>:/root/

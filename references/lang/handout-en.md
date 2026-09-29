@@ -22,7 +22,7 @@ Rules (the same ones the script applies):
      pick the `single` or the `relay` variant, marked below; a variant ends at the
      next marker, heading or rule. Lines marked "relay only" are dropped in the
      single profile (it has no tunnel and no drill).
-  4. Output file: handout.md. Send it as a file (SendUserFile).
+  4. Output file: handout.md. Send it as a file, with your environment's way of handing over a file.
      Never publish it as a page: it contains the panel code and the alert password.
 -->
 # Your VPN — the handout
