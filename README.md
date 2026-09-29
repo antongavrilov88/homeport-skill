@@ -6,15 +6,15 @@ Homeport is a free [Claude](https://claude.ai) skill that turns a cloud server y
 
 How long it takes: your clicks, then about 10 minutes while it installs. A new domain takes 15 minutes to a few hours to go live, and a new hosting account is sometimes reviewed for a few hours.
 
-The server is yours. The domain is yours. The keys never leave your machine. There is no Homeport account, no Homeport backend, and nothing for anyone to shut down except your own server — which you can rebuild.
+The server is yours. The domain is yours. The keys are made on your machine and installed on your server; the first device's code passes through the chat, and you can replace it from the panel. There is no Homeport account, no Homeport backend, and nothing for anyone to shut down except your own server — which you can rebuild.
 
-> Made for one situation: people you care about live where the internet is filtered, and every "install our app" VPN keeps dying. Works in both directions — reaching services back home from abroad, or reaching the world from behind a filter.
+> Made for one situation: people you care about live where the internet is filtered, and every "install our app" VPN keeps dying. Works in both directions — reaching services back home from abroad, or reaching the world from behind a filter. Reaching home needs the server *in* the home country: the automated path creates servers only in DigitalOcean's regions (listed in [`references/providers/digitalocean.md`](references/providers/digitalocean.md)); anywhere else you create the server yourself at a provider there — any Ubuntu 24.04 VPS, a few more clicks on your side.
 
 ---
 
 ## What you get
 
-- **A protocol that looks like ordinary web traffic.** VLESS + XHTTP + REALITY on Xray, on port 443, with a real website under your own domain as the cover. To a probe your server *is* a normal HTTPS site, because it is one.
+- **A protocol that looks like ordinary web traffic — on the relay link and for VLESS apps.** VLESS + XHTTP + REALITY on Xray, on port 443, with a real website under your own domain as the cover. To a probe your server *is* a normal HTTPS site, because it is one. It carries the relay → exit hop of the `relay` profile and the `vless://` link for people who use a VLESS app (Hiddify, v2rayNG). On the default one-server layout your devices don't use it: they connect with plain WireGuard, straight to the server abroad. Some networks detect or slow down plain WireGuard; on those, the `relay` profile or a VLESS app is the better choice.
 - **WireGuard for the devices.** Phones, laptops, TVs and routers connect with the official free WireGuard app. Scan a QR, flip a switch, done. A second port on UDP/443 for hotel and mobile networks that cut everything else.
 - **A web panel** (reachable only from inside the VPN): who is online, how much they used, add or remove a device with a QR code, and on two servers manage the list of domains that bypass the tunnel.
 - **A watchdog** that checks the tunnel every 30 seconds, restarts what it can and pushes a notification to your phone. On two servers (the `relay` profile) it also moves everyone to the direct route and back, and a monthly fire drill (a deliberate two-minute outage) proves that failover actually works, not just "is configured". One server has nothing to fail over to, so it has no failover and no drill.
@@ -33,7 +33,7 @@ devices ──WireGuard──▶ your server abroad ──▶ internet
 devices ──VLESS+REALITY──┘   (for Hiddify / v2rayNG users)
 ```
 
-**`relay`** — for people whose network restricts direct foreign connections or only allows listed IP ranges, or a household whose devices you can't keep reconfiguring. Devices talk WireGuard to a cheap server *inside* the country; that relay carries one disguised connection across the border. When the exit gets banned you replace it in fifteen minutes and nobody at home touches their phone.
+**`relay`** — for people whose network restricts direct foreign connections or only allows listed IP ranges, or a household whose devices you can't keep reconfiguring. Devices talk WireGuard to a cheap server *inside* the country; that relay carries one disguised connection across the border. When the exit gets banned you replace it and nobody at home touches their phone.
 
 ```
 devices ──WireGuard──▶ relay (home country) ──VLESS+XHTTP+REALITY──▶ exit (abroad) ──▶ internet
@@ -205,6 +205,8 @@ Everything else stays on your server.
 
 ## Why REALITY and not plain WireGuard across the border
 
+Where REALITY is used: on the link that crosses the border in the `relay` profile (relay → exit) and on the `vless://` link for people who use a VLESS app (Hiddify, v2rayNG). On the default one-server layout your devices don't use it: they talk plain WireGuard to the server abroad, with exactly the tells below. Some networks detect or slow down plain WireGuard; on those, the `relay` profile or a VLESS app is the better choice.
+
 Modern DPI doesn't decrypt; it classifies. Bare WireGuard has a recognizable first packet, an odd TLS fingerprint (UDP on 443), no answer when probed, and a constant symmetric UDP stream to a foreign datacenter — four tells. REALITY + XHTTP answers each one: the wire looks like TLS 1.3, uTLS mimics Chrome, a probe gets a real site with a valid certificate, and XHTTP multiplexes everything into one or two long padded HTTP/2 connections. The residual tell is the destination itself — a foreign host — which is why the `relay` profile exists.
 
 Why your **own** domain instead of borrowing a big-brand SNI: with a borrowed name the network owner, IP and SNI don't match, active probing sees that, and Xray's own docs warn that impersonating Apple or Microsoft gets your IP banned. With your domain on your server, the probe gets the real site, because it is the real site.
@@ -244,7 +246,7 @@ Internally the scripts still call themselves `vpn-kit` (`/opt/vpn-kit`, `/root/v
 ## Hard rules the skill follows
 
 - One server per tag at any time; never touches machines it didn't create; never deletes the old server before the new one is verified.
-- The REALITY private key exists only on the exit server. The build step strips it from the relay installer and the skill checks that it did.
+- The REALITY private key goes into no chat, no project and no relay installer. It exists in `params.json` on your machine, inside `out/setup-exit.sh` (and so in the server's cloud-init metadata when it is created that way) and on the exit server; the build step strips it from the relay installer and the skill checks that it did.
 - The cover site is never a fake company, shop or review page. It's a real, boring, honest site — yours.
 - Never helps bypass card verification, never suggests registering an account in someone else's name.
 - Never starts creating servers from an unattended or scheduled session: it costs money and it's irreversible.
