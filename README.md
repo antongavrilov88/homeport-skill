@@ -90,7 +90,7 @@ claude plugin update homeport@homeport
 git clone https://github.com/antongavrilov88/homeport-skill ~/.claude/skills/homeport
 ```
 
-Then, in any session: *"set up my own VPN"*, *"VPN for my parents"*, *"подними мне VPN"*, or `/homeport` (`/homeport:homeport` when installed as a plugin).
+Then, in any session: *"set up my own VPN"*, *"VPN for my parents"*, or `/homeport` (`/homeport:homeport` when installed as a plugin).
 
 **claude.ai:** download `homeport-skill.zip` from the [latest release](https://github.com/antongavrilov88/homeport-skill/releases), then Settings → Capabilities → Skills → Upload skill. Start a chat and say what you want. Read the claude.ai row in the table above first: Claude will explain each step and you will run the commands.
 
@@ -230,8 +230,8 @@ More in [`references/architecture.md`](references/architecture.md) — including
 SKILL.md                     the skill itself — how the agent runs the setup, step by step
 references/
   human-steps.md             every manual step: what has to happen and what the agent verifies
-  lang/en.md, lang/ru.md     the words for every human-facing moment, per language (ru is the tested wording)
-  lang/handout-en.md, -ru.md handout templates
+  lang/en.md                 the words for every human-facing moment; any other language is the agent's live translation
+  lang/handout-en.md         the handout template: the text make-handout.py writes
   providers/*.md             one dated file per hosting provider: layer, automation, payment, click paths
   provisioning.md            provider index, "no card that works?", delivering installers, DNS
   architecture.md            how it works and why; alternatives rejected; risks
@@ -242,7 +242,7 @@ scripts/
   build-installers.py        packs payload + params into self-contained setup-*.sh
   provision-do.py            DigitalOcean: check, keys, create, DNS, list, destroy
   client-link.py             vless:// link for Hiddify / v2rayNG
-  make-handout.py            the Russian handout (tested wording)
+  make-handout.py            the handout, in English
   payload/                   what actually lands on the servers (see table above)
 skills/homeport/SKILL.md     the plugin entry point: points at the root SKILL.md
 .claude-plugin/              marketplace.json and plugin.json for /plugin install

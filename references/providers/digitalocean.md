@@ -14,7 +14,7 @@
 | **Firewall** | None by default — every port of the droplet is open until the installer sets up nftables. A **Cloud Firewall** is optional; if one is attached it must allow `22/80/443` tcp and `443/51821` udp inbound. |
 | **Quirks** | `ssh_keys` is mandatory at creation: without it the droplet boots in "change your password on first login" mode and refuses key logins — the script refuses to create such a machine. `user_data` is limited to 64 KB (the exit installer is about 49 KB). The `vpn-exit` tag is how `list` and `destroy` find the machine; `destroy` refuses without it. Metadata (`user_data`) is readable by any local process: fine for the exit, never for the relay installer. |
 
-## Click paths (the person clicks; the words are in `lang/<xx>.md` §1–§4)
+## Click paths (the person clicks; the words are in `lang/en.md` §1–§4)
 
 **Account (§1)** — `cloud.digitalocean.com/registrations/new` → sign up with email and password, or with Google → confirm the email → **Billing** → add a card or PayPal.
 

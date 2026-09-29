@@ -29,7 +29,7 @@ Semantic. The skill's user-facing behaviour is the API: a change to what the ins
 
 ## Language and wording
 
-`SKILL.md` and `references/*.md` are English instructions. Everything said to the person lives in `references/lang/<xx>.md`; the Russian file and the Russian handout are wording tested with real families — change them only after testing the new wording on a real person, and say so in the PR. New languages: translate `lang/en.md` and `lang/handout-en.md`, keep the section numbers. `skills/homeport/SKILL.md` is generated from the root `SKILL.md` frontmatter; if you change the description, regenerate it (CI fails otherwise).
+English only. `SKILL.md` and `references/*.md` are English instructions; code, comments, commit messages and the trigger phrases in the skill description are English too. The only human-facing wording files are `references/lang/en.md` (what the agent says at each step) and `references/lang/handout-en.md` (the handout — the same text `scripts/make-handout.py` writes; change the two together). Any other language is the agent's live translation of those two files, so there are no other language files and none are added. `skills/homeport/SKILL.md` is generated from the root `SKILL.md` frontmatter; if you change the description, regenerate it (CI fails otherwise).
 
 ## Wording rules
 
@@ -52,7 +52,7 @@ The Cyrillic terms are matched as stems: every case form fails, not only the dic
 
 **Circumvention framing** is banned as well, case-insensitive, by the guard's second check: `bypass(es|ing)? (the )?(block|censor|filter)`, `evad(e|es|ing) (block|censor|detect|filter)`, `circumvent`, `get around (the )?block`, `when (it'?s |you'?re )?blocked`, `unblock`, `keeps? working when`. The patterns are narrow on purpose, so "bypassing the relay" and "apps that refuse VPN connections keep working" pass. Say instead: "carrier-restricted networks", "local sites stay reachable, foreign sites are unavailable", "networks that detect or slow down plain WireGuard", "the tunnel is down".
 
-What stays allowed: the *language* sense — "the panel is in Russian", `lang/ru.md`, `handout-ru.md` — because the server-side UI has a language and it has to be named. Provider files describe signup facts neutrally ("cards issued in some sanctioned countries are refused"), never by naming the country the user is in. Script logic and server paths (`/opt/vpn-kit`) are out of scope of the guard and of this section.
+What stays allowed: the *language* sense — "the panel is in Russian" — because the server-side UI has a language and it has to be named. Provider files describe signup facts neutrally ("cards issued in some sanctioned countries are refused"), never by naming the country the user is in. Script logic and server paths (`/opt/vpn-kit`) are out of scope of the guard and of this section.
 
 **Product name.** The product is **Homeport**, spelled exactly that way: one word, only the H capitalised. It used to be called Burrow. The same guard fails on the whole word `burrow`, case-insensitive, anywhere except `CHANGELOG.md` (history), this file and the guard itself, and lines that tell the rename story: `formerly Burrow` in the skill description, the README's "Upgrading from Burrow" note with its `marketplace remove burrow` and `~/.claude/skills/burrow` commands, and the `"burrow"` keyword in `.claude-plugin/`. To allow a new line, add a narrow pattern to `OLD_NAME_ALLOWED` in `.github/wording-guard.sh` and say why in the PR. The server-side working name `vpn-kit` is not affected.
 
