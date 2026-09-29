@@ -2,7 +2,6 @@
 params.json
 *.params.json
 out/
-pamyatka.md
 handout.md
 *.conf
 !scripts/payload/**/*.conf

@@ -1,6 +1,6 @@
 # What you say — English
 
-Use one section at a time: take the section for the step you are on, retell it in your own words, wait for "done". Never paste this file, or a whole list of sections, into the chat. Section numbers match `references/human-steps.md`. Everything in quotation marks is meant to be said to the person, in their language: for a language other than English or Russian, translate from here as you go — the meaning and the warnings, not the sentences. The Russian file `ru.md` is tested with real families; use it verbatim.
+Use one section at a time: take the section for the step you are on, retell it in your own words, wait for "done". Never paste this file, or a whole list of sections, into the chat. Section numbers match `references/human-steps.md`. Everything in quotation marks is meant to be said to the person, in their language: this is the only wording file, so for any other language translate from here as you go — the meaning and the warnings, not the sentences.
 
 The click steps below are the spoken form of the DigitalOcean paths. `providers/digitalocean.md` is the canonical copy: when the provider's interface changes, update it first, then these two files.
 
@@ -146,7 +146,7 @@ The panel is in English. The buttons the person needs (full list at the end of t
 
 [relay] If Wi-Fi works and mobile data does not, fix that before anything else, in this order: re-issue this device on `alt_port` 443 (**443 (strict networks)**) and try mobile data again; if it still will not connect, the relay's own address is not getting through that network, and the answer is a different provider in the users' country — not another setting. Do it now: the relay's IP is written into every config the panel issues, so moving the relay after the QR codes go out means re-issuing every device.
 
-[relay] The two warnings: "Some mobile operators cut this kind of connection on the usual port. If a phone won't connect on mobile data, we make it a 443 one — that goes through almost everywhere." And: "If their operator starts blocking the tunnel, everyone is moved to the direct route within a minute or two, automatically. The internet keeps working, just without the bypass, and they're moved back when it recovers. So 'the VPN is on but the sites don't open' means that, not that the whole thing is broken."
+[relay] The two warnings: "Some mobile operators cut this kind of connection on the usual port. If a phone won't connect on mobile data, we make it a 443 one — that goes through almost everywhere." And: "If their operator starts blocking the tunnel, everyone is moved to the direct route within a minute or two, automatically. Local sites stay reachable, foreign sites are unavailable for that time, and they're moved back when it recovers. So 'the VPN is on but the sites don't open' means that, not that the whole thing is broken."
 
 ## §9 Notifications
 

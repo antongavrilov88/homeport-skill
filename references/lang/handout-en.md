@@ -1,6 +1,6 @@
 <!--
-English handout template. The Russian handout is produced by scripts/make-handout.py;
-this file mirrors its variables and rules so that any language stays in step with it.
+English handout template. scripts/make-handout.py writes this same text in English;
+the two change together, so any language translated from either stays in step.
 Render it yourself from params.json (never paste params.json into the chat).
 
 Variables:
@@ -22,7 +22,7 @@ Rules (the same ones the script applies):
      pick the `single` or the `relay` variant, marked below; a variant ends at the
      next marker, heading or rule. Lines marked "relay only" are dropped in the
      single profile (it has no tunnel and no drill).
-  4. Output file: handout.md. Send it as a file (SendUserFile).
+  4. Output file: handout.md. Send it as a file, with your environment's way of handing over a file.
      Never publish it as a page: it contains the panel code and the alert password.
 -->
 # Your VPN — the handout
@@ -97,7 +97,7 @@ First wait 2–3 minutes.
 <!-- FAILOVER: single -->
 Everything inside is built so that when something breaks, the system restarts what got stuck by itself and writes to you. Quite often everything comes back on its own within those couple of minutes.
 <!-- FAILOVER: relay -->
-Everything inside is built so that when something breaks, people are moved to the fallback route automatically within about a minute — the internet keeps working, just without the bypass. When the main channel is repaired, everyone is moved back, also by itself.
+Everything inside is built so that when something breaks, people are moved to the fallback route automatically within about a minute — local sites stay reachable, foreign sites are unavailable for that time. When the main channel is repaired, everyone is moved back, also by itself.
 <!-- both profiles from here -->
 
 What you can check yourself:

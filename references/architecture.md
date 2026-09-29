@@ -74,10 +74,13 @@ devices ──WireGuard──► the exit ──► internet
 devices ──VLESS+REALITY──┘  (for the Hiddify / v2rayNG apps)
 ```
 
-WireGuard is for devices that cannot run an Xray client (TVs, routers, old
-tablets) and for people outside the filtered zone. REALITY is for phones and
-laptops inside the filtered country. The panel shows WireGuard clients; REALITY
-clients are issued as a `vless://` link and do not appear in the panel.
+WireGuard is what the panel issues and what every device gets by default,
+phones inside the filtered country included: plain WireGuard, straight to the
+server abroad. REALITY on this layout is the `vless://` link from
+`client-link.py`, for people who use a VLESS app (Hiddify, v2rayNG) — the
+better choice on networks that detect or slow down plain WireGuard, as is the
+`relay` profile. The panel shows WireGuard clients; REALITY clients are issued
+as a `vless://` link and do not appear in the panel.
 
 Automatic failover is impossible in this profile — there is nowhere to switch to.
 The watchdog still runs: it probes the channel, restarts Xray and sends a
@@ -124,8 +127,8 @@ An engineering estimate, not statistics.
 **Not built.** A design note, kept here so the next person does not have to derive it again.
 
 Today the watchdog has exactly one place to put people when the tunnel dies: the
-relay's own direct route. On an ordinary network that is a real fallback — the
-internet keeps working, just without the tunnel. On a carrier-restricted network it
+relay's own direct route. On an ordinary network that is a real fallback —
+everything still opens, just without the tunnel. On a carrier-restricted network it
 barely is one: local sites stay reachable, foreign sites are unavailable, which is
 usually the part the household bought the VPN for. So the fallback that reads fine in
 a drill report is weakest exactly where the `relay` profile is most needed.

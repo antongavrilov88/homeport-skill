@@ -1,9 +1,9 @@
-# Домены, которые ходят напрямую с релея, минуя туннель.
-# Сюда — приложения, которые отказываются работать через VPN (банки, госпорталы,
-# доставка): им лучше видеть адрес релея, а не зарубежный. Платёжные сети ниже уже внесены;
-# правится через дашборд или руками, после правки: sudo python3 /usr/local/sbin/vpn-split.py
-# Поддомены включаются сами: mybank.example покрывает и app.mybank.example.
-# Если в params.json задан home_geoip, адреса домашней страны и так идут напрямую.
+# Domains that leave the relay directly, not through the tunnel.
+# For apps that refuse to work through a VPN (banks, government portals, delivery):
+# they had better see the relay's address, not a foreign one. The payment networks below
+# are already listed; edit through the panel or by hand, then: sudo python3 /usr/local/sbin/vpn-split.py
+# Subdomains are included automatically: mybank.example also covers app.mybank.example.
+# If home_geoip is set in params.json, the home country's addresses go direct anyway.
 
 # --- Seeded defaults -------------------------------------------------------
 # Payment and card networks that commonly refuse or step up verification when

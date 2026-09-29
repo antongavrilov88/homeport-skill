@@ -1,30 +1,30 @@
 #!/bin/bash
-# Установка релея: WireGuard для клиентов, прозрачный перехват их трафика в Xray,
-# оттуда — VLESS + XHTTP + REALITY до выходной машины. Плюс дашборд, сторож и учения.
+# Relay install: WireGuard for clients, transparent interception of their traffic into
+# Xray, from there VLESS + XHTTP + REALITY to the exit machine. Plus the panel, the watchdog and the drill.
 set -euo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$KIT/vars.sh"
 export DEBIAN_FRONTEND=noninteractive
 log() { echo "[$(date +%H:%M:%S)] $*"; }
-die() { echo "ОШИБКА: $*" >&2; exit 1; }
-[ "$(id -u)" = 0 ] || die "запускать от root"
+die() { echo "ERROR: $*" >&2; exit 1; }
+[ "$(id -u)" = 0 ] || die "run as root"
 
-log "ставлю пакеты"
+log "installing packages"
 APT="apt-get -o DPkg::Lock::Timeout=600 -y -qq"
-for i in 1 2 3; do $APT update && break || { log "apt update не удался ($i), жду"; sleep 20; }; done
+for i in 1 2 3; do $APT update && break || { log "apt update failed ($i), waiting"; sleep 20; }; done
 $APT install curl ca-certificates nftables wireguard-tools qrencode python3 iproute2 jq
 
 # ---------------------------------------------------------------- Xray
 if ! command -v xray >/dev/null || ! xray version 2>/dev/null | grep -q "${XRAY_VERSION#v}"; then
-  log "ставлю Xray $XRAY_VERSION"
+  log "installing Xray $XRAY_VERSION"
   bash -c "$(curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" \
     @ install --version "${XRAY_VERSION#v}" >/dev/null
 fi
-command -v xray >/dev/null || die "Xray не установился"
+command -v xray >/dev/null || die "Xray did not install"
 
-# ---------------------------------------------------------------- клиент REALITY
-[ -n "$EXIT_IP" ] || die "в установщике не задан адрес выходной машины. Впиши exit_ip в params.json и пересобери: python3 scripts/build-installers.py --params params.json --out ./out"
-log "конфигурирую Xray (клиент REALITY → $EXIT_IP)"
+# ---------------------------------------------------------------- REALITY client
+[ -n "$EXIT_IP" ] || die "the installer has no exit machine address. Put exit_ip into params.json and rebuild: python3 scripts/build-installers.py --params params.json --out ./out"
+log "configuring Xray (REALITY client → $EXIT_IP)"
 install -d -m755 /usr/local/etc/xray
 python3 - <<PY
 import json
@@ -57,14 +57,14 @@ cfg = {
 }
 json.dump(cfg, open("/usr/local/etc/xray/config.json", "w"), indent=2)
 PY
-xray run -test -c /usr/local/etc/xray/config.json >/dev/null || die "конфиг Xray не проходит проверку"
+xray run -test -c /usr/local/etc/xray/config.json >/dev/null || die "Xray config fails its check"
 
-# ---------------------------------------------------------------- перехват трафика
-log "правила перехвата"
+# ---------------------------------------------------------------- traffic interception
+log "interception rules"
 install -d -m755 /etc/xray
 MYIP=$(curl -s -m 10 https://api.ipify.org || ip -o -4 addr show scope global | awk '{print $4}' | cut -d/ -f1 | head -1)
-# Если файл уже есть — сохраняем действующий состав proxied_src: повторный
-# запуск установщика не должен молча снимать всех клиентов с туннеля.
+# If the file already exists, keep the current proxied_src members: a re-run of
+# the installer must not silently take every client off the tunnel.
 KEEP=$(python3 - <<'PYEOF' || true
 import re
 try:
@@ -78,11 +78,11 @@ PYEOF
 ELEMENTS=""
 [ -n "$KEEP" ] && ELEMENTS="
         elements = { $KEEP }"
-[ -n "$KEEP" ] && log "сохраняю действующий состав туннеля: $KEEP"
+[ -n "$KEEP" ] && log "keeping the current tunnel members: $KEEP"
 cat > /etc/xray/xray-tproxy.nft <<EOF
 #!/usr/sbin/nft -f
-# Заворачиваем трафик выбранных клиентов wg-clients в Xray (dokodemo-door :12345).
-# proxied_src — кто идёт через туннель. Кого здесь нет, тот выходит напрямую с релея.
+# Redirect the traffic of the selected wg-clients into Xray (dokodemo-door :12345).
+# proxied_src lists who goes through the tunnel. Anyone not here leaves the relay directly.
 table ip xray_tproxy
 delete table ip xray_tproxy
 table ip xray_tproxy {
@@ -107,8 +107,8 @@ table ip xray_tproxy {
 }
 EOF
 
-# ---------------------------------------------------------------- фаервол
-# Своя таблица, без flush ruleset: xray_tproxy, wgports и vpnnat живут отдельно.
+# ---------------------------------------------------------------- firewall
+# Own table, no flush ruleset: xray_tproxy, wgports and vpnnat live separately.
 cat > /etc/nftables.conf <<EOF
 #!/usr/sbin/nft -f
 table inet filter
@@ -131,36 +131,36 @@ EOF
 nft -f /etc/nftables.conf
 systemctl enable --now nftables >/dev/null 2>&1 || true
 
-# ---------------------------------------------------------------- клиентская часть
-# (создаёт wg-clients и /etc/xray/wgports.nft, который нужен следующему юниту)
+# ---------------------------------------------------------------- client side
+# (creates wg-clients and /etc/xray/wgports.nft, which the next unit needs)
 bash "$KIT/common/install-clientside.sh"
 
-# ---------------------------------------------------------------- юниты и запуск
+# ---------------------------------------------------------------- units and start
 install -m644 "$KIT/relay/systemd/"*.service "$KIT/relay/systemd/"*.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable xray xray-tproxy-route >/dev/null 2>&1
 systemctl restart xray-tproxy-route
 systemctl restart xray
 
-# ---------------------------------------------------------------- разделение маршрутов
-log "разделение маршрутов"
-python3 /usr/local/sbin/vpn-split.py || die "vpn-split не отработал"
+# ---------------------------------------------------------------- route split
+log "route split"
+python3 /usr/local/sbin/vpn-split.py || die "vpn-split failed"
 
-# сторож — последним, когда туннель уже поднят
+# the watchdog last, once the tunnel is up
 systemctl restart vpn-watchdog
 systemctl enable --now vpn-drill.timer vpn-drill-check.timer >/dev/null 2>&1 || true
 
-# ---------------------------------------------------------------- проверка
-log "проверяю туннель"
+# ---------------------------------------------------------------- check
+log "checking the tunnel"
 sleep 4
 OUTIP=$(curl -s -m 20 -x socks5h://127.0.0.1:1080 https://api.ipify.org || true)
 echo
-echo "=== РЕЛЕЙ ГОТОВ ==="
+echo "=== RELAY READY ==="
 systemctl is-active xray vpn-monitor vpn-watchdog xray-tproxy-route wg-quick@wg-clients 2>/dev/null | tr '\n' ' ' || true; echo
 if [ "$OUTIP" = "$EXIT_IP" ]; then
-  echo "туннель работает: выход виден как $OUTIP"
+  echo "tunnel works: the exit is seen as $OUTIP"
 else
-  echo "ВНИМАНИЕ: через туннель наружу видно '$OUTIP', ожидалось '$EXIT_IP'."
-  echo "Смотри: journalctl -u xray -n 40  и  /usr/local/sbin/vpn-diag.sh"
+  echo "WARNING: through the tunnel the outside sees '$OUTIP', expected '$EXIT_IP'."
+  echo "See: journalctl -u xray -n 40  and  /usr/local/sbin/vpn-diag.sh"
 fi
-echo "дашборд: http://$WG_SUBNET.1:$DASH_PORT (изнутри VPN), код $DASH_TOKEN"
+echo "panel: http://$WG_SUBNET.1:$DASH_PORT (from inside the VPN), code $DASH_TOKEN"

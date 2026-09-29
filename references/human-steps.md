@@ -2,9 +2,9 @@
 
 Everything else the skill does itself. This file covers only what technically cannot be done for them: it needs their card, their email, their phone in their hand.
 
-**How to use it:** one section at a time. What has to happen and what you verify is here. The words are in `lang/<xx>.md` under the same section number (`ru` is the tested wording; `en` is the source for any other language). The exact buttons of a hosting provider are in `providers/<provider>.md`. Never hand the person the whole file: someone who receives a wall of ten sections closes it and does not come back.
+**How to use it:** one section at a time. What has to happen and what you verify is here. The words are in `lang/en.md` under the same section number; for any other language, translate from it as you go. The exact buttons of a hosting provider are in `providers/<provider>.md`. Never hand the person the whole file: someone who receives a wall of ten sections closes it and does not come back.
 
-**Tone:** they owe you no technical vocabulary. Every step starts with why — `lang/<xx>.md` has the sentence.
+**Tone:** they owe you no technical vocabulary. Every step starts with why — `lang/en.md` has the sentence.
 
 ---
 
@@ -30,7 +30,7 @@ Everything else the skill does itself. This file covers only what technically ca
 
 **What happens:** they generate a token — full access, 30-day expiry — and paste it to you. It is shown once. Buttons: `providers/digitalocean.md`.
 
-**Must be said aloud:** the key passes through the conversation; you revoke it together at the end (`lang/<xx>.md` §2).
+**Must be said aloud:** the key passes through the conversation; you revoke it together at the end (`lang/en.md` §2).
 
 **You verify, immediately:** `python3 scripts/provision-do.py check`. "Not active" → the card is not attached → back to §1, in words, no machine creation.
 
@@ -48,7 +48,7 @@ Everything else the skill does itself. This file covers only what technically ca
 
 **If they already own one:** do not send them shopping. Ask one thing — does anything live on it, a website or email? — and deliver the warning below anyway. If something does live there, it is the wrong domain for this.
 
-**The warning to deliver in full** (`lang/<xx>.md` §3): not a domain they care about; not one that already carries their site or their email; the server's address gets blocked from time to time and the domain carries that history; a blocked domain takes everything on it down.
+**The warning to deliver in full** (`lang/en.md` §3): not a domain they care about; not one that already carries their site or their email; the server's address gets blocked from time to time and the domain carries that history; a blocked domain takes everything on it down.
 
 **You verify:** nothing until DNS (§4/§5).
 
@@ -78,7 +78,7 @@ Everything else the skill does itself. This file covers only what technically ca
 | A | `www` | `<exit IP>` | 300 |
 | A | `push` | `<exit IP>` | 300 |
 
-**The pitfalls to pre-empt** (`lang/<xx>.md` §5): `@` vs. an empty field vs. the full domain; TTL is optional; type A only — not AAAA, not CNAME.
+**The pitfalls to pre-empt** (`lang/en.md` §5): `@` vs. an empty field vs. the full domain; TTL is optional; type A only — not AAAA, not CNAME.
 
 **You verify:** `python3 scripts/provision-do.py dns-check --domain <domain> --ip <IP>` — yourself, every few minutes, and tell them when it is through. Certificates follow by themselves once the records resolve.
 
@@ -92,9 +92,9 @@ Everything else the skill does itself. This file covers only what technically ca
 
 **What you need from them:** the address, the login (root, or a user with passwordless sudo) and the password or key — providers email these right after payment.
 
-**If you have to move it, move it before the QR codes go out.** The relay's address is written into every device config, so a relay that turns out not to be reachable on the users' mobile networks has to be replaced *before* anyone has scanned a code — afterwards it means re-issuing every device. That is exactly what the mobile-data test on the first device is for (step 7; `lang/<xx>.md` §8): first `alt_port` 443, and only then a different provider in the same country.
+**If you have to move it, move it before the QR codes go out.** The relay's address is written into every device config, so a relay that turns out not to be reachable on the users' mobile networks has to be replaced *before* anyone has scanned a code — afterwards it means re-issuing every device. That is exactly what the mobile-data test on the first device is for (step 7; `lang/en.md` §8): first `alt_port` 443, and only then a different provider in the same country.
 
-**Say it straight** (`lang/<xx>.md` §6): the password passes through the chat; after the install you show them how to change it (`passwd`, one command).
+**Say it straight** (`lang/en.md` §6): the password passes through the chat; after the install you show them how to change it (`passwd`, one command).
 
 **You verify:** `ssh` in; `lsb_release -a` says 24.04; `curl -4 https://api.ipify.org` prints the address they gave you.
 
@@ -104,7 +104,7 @@ Everything else the skill does itself. This file covers only what technically ca
 
 Only when you have no SSH access from where you run.
 
-**What happens:** you send `setup-exit.sh` or `setup-relay.sh` (SendUserFile) and two lines; they open a terminal and paste. The three things that confuse everyone — the invisible password, the `yes/no` question, the password asked twice — are scripted in `lang/<xx>.md` §7, together with how to open a terminal on Mac, Windows and Linux and the PowerShell paste quirk.
+**What happens:** you send `setup-exit.sh` or `setup-relay.sh` (with your environment's way of handing over a file) and two lines; they open a terminal and paste. The three things that confuse everyone — the invisible password, the `yes/no` question, the password asked twice — are scripted in `lang/en.md` §7, together with how to open a terminal on Mac, Windows and Linux and the PowerShell paste quirk.
 
 **The lines** (substitute the real address; `sudo bash` instead of `bash` when the login is not root):
 
@@ -113,7 +113,7 @@ scp ~/Downloads/setup-relay.sh root@ADDRESS:/root/
 ssh root@ADDRESS 'bash /root/setup-relay.sh'
 ```
 
-**You verify:** ask for the last twenty lines. The installers print in Russian: `=== ВЫХОДНАЯ МАШИНА ГОТОВА ===` (exit ready) or `=== РЕЛЕЙ ГОТОВ ===` (relay ready) followed by the service list and, on the relay, `туннель работает` (tunnel works) with the exit's IP. Anything else → `troubleshooting.md`. Then `bash /usr/local/sbin/vpn-verify.sh` through them or over SSH.
+**You verify:** ask for the last twenty lines. The installers print `=== EXIT MACHINE READY ===` or `=== RELAY READY ===` followed by the service list and, on the relay, `tunnel works` with the exit's IP. Anything else → `troubleshooting.md`. Then `bash /usr/local/sbin/vpn-verify.sh` through them or over SSH.
 
 ---
 
@@ -123,9 +123,9 @@ ssh root@ADDRESS 'bash /root/setup-relay.sh'
 
 **The first device** cannot come from the panel — the panel is reachable only from inside the VPN. You issue it from the server's shell (`operations.md`, "Issue a device from the shell") and send the QR image as a file; the person scans it from the screen. When you have no shell to the server, the person runs that call themselves and `qrencode -t ansiutf8 < /root/device.conf` shows the QR in their terminal, or they reach the panel through `ssh -L 8088:127.0.0.1:8088 root@<IP>` and `http://127.0.0.1:8088`. Every later device: the person, in the panel, from a device that is already connected. People who are not in the room get a screenshot of the QR or the `.conf` over a messenger; the message is deleted once scanned.
 
-**The panel:** opened from a device that is already on the VPN, at `http://<wg_subnet>.1:<dashboard_port>` (default `http://10.67.0.1:8088`); the admin code is asked once per browser. **Its labels are English** — the glossary is in `lang/<xx>.md`; for a person who does not read English, say so once before this step and name each button as it is written.
+**The panel:** opened from a device that is already on the VPN, at `http://<wg_subnet>.1:<dashboard_port>` (default `http://10.67.0.1:8088`); the admin code is asked once per browser. **Its labels are English** — the glossary is in `lang/en.md`; for a person who does not read English, say so once before this step and name each button as it is written.
 
-**[relay] Order:** the first device is a phone on mobile data with Wi-Fi off → "does youtube open?" → switch the bypass on for that device → the same question → only then QR codes for everyone else. Phones on strict operators: port 443. The two warnings (high UDP ports; what failover looks like) are in `lang/<xx>.md` §8.
+**[relay] Order:** the first device is a phone on mobile data with Wi-Fi off → "does youtube open?" → switch the bypass on for that device → the same question → only then QR codes for everyone else. Phones on strict operators: port 443. The two warnings (high UDP ports; what failover looks like) are in `lang/en.md` §8.
 
 **You verify:** "does youtube open?" from them; `sudo wg show wg-clients` on the server shows a fresh handshake for the new peer. [relay] After the bypass: the device's address is in the `proxied_src` set and the panel shows it as **tunnel**.
 
@@ -141,4 +141,4 @@ ssh root@ADDRESS 'bash /root/setup-relay.sh'
 
 ## 10. Cleaning up
 
-A day or two after the install, one message (`lang/<xx>.md` §10): revoke the access key (§2); delete the server password and the key from the conversation; store `params.json` in a password manager or a cloud drive; a calendar reminder a month before the domain renewal.
+A day or two after the install, one message (`lang/en.md` §10): revoke the access key (§2); delete the server password and the key from the conversation; store `params.json` in a password manager or a cloud drive; a calendar reminder a month before the domain renewal.

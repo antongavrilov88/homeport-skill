@@ -1,5 +1,5 @@
 [Unit]
-Description=Еженедельная проверка готовности к отказу (без падения)
+Description=Weekly failover readiness check (no outage)
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/vpn-drill.sh --check
