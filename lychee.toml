@@ -1,0 +1,39 @@
+# Link check settings, used by .github/workflows/links.yml (lychee 0.24.2).
+# Run it locally the same way:
+#   lychee --no-progress --config lychee.toml README.md SKILL.md 'references/**/*.md'
+# Every exclusion below names the host, what it does to bots, and whether and when
+# its pages were checked by hand. Exclude a host only when it refuses bots: a dead
+# page gets fixed, not excluded.
+
+# Retries and timeouts: a slow or briefly unreachable host is retried before its
+# link counts as dead. lychee retries server errors (5xx), 408 and timeouts.
+max_retries = 3       # retries per link after the first attempt
+retry_wait_time = 2   # seconds before the first retry; the wait doubles on each one
+timeout = 30          # seconds per request, from connect to the last byte
+
+# Accepted status codes: lychee's default (1xx and 2xx) plus 429.
+# 429 Too Many Requests: rate limited, not dead. The host answered; it only asked us
+# to slow down.
+accept = ["100..=103", "200..=299", "429"]
+
+# Links inside code blocks are not checked (lychee's default, kept on purpose): there
+# they are commands, placeholders such as http://<relay address>, and addresses that
+# only exist on a server or on your machine, such as http://127.0.0.1:8088/.
+include_verbatim = false
+
+exclude = [
+  # docs.arvancloud.ir (references/providers/arvancloud.md, references/provisioning.md):
+  # a client without this host's cookies gets a 307 back to the same address, plus two
+  # cookies. Without a cookie jar lychee follows that redirect until max_redirects and
+  # reports 307 for every page, live or not: a made-up page got the same 307 on
+  # 2026-10-04. The four linked pages were read in a real session on 2026-09-29 (#59);
+  # on 2026-10-04 a lychee run with a cookie jar passed all four and got 404 for the
+  # made-up page.
+  '^https://docs\.arvancloud\.ir/',
+  # linkedin.com and www.linkedin.com (README.md): refuse bots. linkedin.com answers
+  # 200 with a "Checking your browser - reCAPTCHA" page instead of the profile, and
+  # www.linkedin.com answers 999; a made-up profile gets the same answers (measured
+  # 2026-10-04), so lychee can't tell a live profile from a dead one. Not opened in a
+  # browser for this file: check the profile by hand when the link changes.
+  '^https://(www\.)?linkedin\.com/',
+]
