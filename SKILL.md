@@ -53,7 +53,7 @@ Ask this first, in plain words (with a multiple-choice question tool if you have
 
 | What they answer | Profile |
 |---|---|
-| Abroad, or somewhere the internet is not filtered: "just me, I travel", "friends in a few countries", "I live abroad and need services from home" | `single` |
+| Abroad, or somewhere the internet is not filtered: "just me, I travel", "friends in a few countries", "I live abroad and need services from home" (the server then goes in the home country, step 3) | `single` |
 | In a country with filtering, but on ordinary networks: a VPN app on their phone connects fine on mobile data, and you can reach their devices when something changes | `single` |
 | Their network restricts direct foreign connections or only allows listed IP ranges — carrier-restricted mobile networks first of all; or it is a household whose phones you cannot keep reconfiguring | `relay` |
 | They do not know | One follow-up, still in plain words: "On their phone, with Wi-Fi off, does any VPN app connect at all?" If nobody can check, take `single` and say that a relay can be added later, at the price of a new QR code on every device. |
@@ -131,7 +131,7 @@ python3 scripts/provision-do.py create --name vpn-exit --tag vpn-exit \
     --ssh-key <id from new-key> --user-data out/setup-exit.sh --region <region>
 ```
 
-Pick the region yourself, nearest to the users (`single`) or to the relay (**[relay]**): `fra1` / `ams3` / `lon1` Europe, `sgp1` Asia, `blr1` India, `nyc3` / `tor1` / `sfo3` the Americas, `syd1` Australia. People spread over continents: nearest to the majority. Do not ask — they do not know what the codes mean. Building the installer before the machine's address exists is fine: the exit detects its own public address at install time.
+Pick the region yourself, nearest to the users (`single`) or to the relay (**[relay]**): `fra1` / `ams3` / `lon1` Europe, `sgp1` Asia, `blr1` India, `nyc3` / `tor1` / `sfo3` the Americas, `syd1` Australia. People spread over continents: nearest to the majority. Do not ask — they do not know what the codes mean. The exception is someone abroad who needs services from home (step 0): the server goes **in the home country** — a DigitalOcean region there if one exists (listed in `references/providers/digitalocean.md`), otherwise a provider in that country, created by hand (`references/provisioning.md`, `references/providers/generic-ubuntu.md`) and installed by the "If the server already exists" path below; if they have not said which country home is, that is the one plain question to ask. Building the installer before the machine's address exists is fine: the exit detects its own public address at install time.
 
 As soon as you have the address — DNS, while the machine boots:
 
@@ -258,7 +258,7 @@ Both profiles end at the same scripts. What differs:
 | `gen-secrets.py` | `--mode single` | `--mode relay --home-geoip <users' country code>` |
 | `--site-title`, `--site-tagline` | in the person's language (the built-in default tagline is a generic English line) | same |
 | `build-installers.py` produces | `out/setup-exit.sh` — no rebuild needed, the exit detects its own address | `out/setup-exit.sh` + `out/setup-relay.sh`; rebuild once `exit_ip` and `ntfy_alert_token` are in `params.json` |
-| Exit machine | `provision-do.py create --tag vpn-exit`, region nearest the users; or any Ubuntu 24.04 host by `references/providers/` | same, region nearest the relay |
+| Exit machine | `provision-do.py create --tag vpn-exit`, region nearest the users (services from home: in the home country, step 3); or any Ubuntu 24.04 host by `references/providers/` | same, region nearest the relay |
 | Relay machine | — | created by the person at a home-country provider (`providers/yandex-cloud.md`, `generic-ubuntu.md`); installer over SSH only, never cloud-init |
 | `params.json` fields you fill in | `exit_ip`, `ntfy_alert_token` | + `relay_ip` |
 | Devices connect to | the exit (`51821/udp`, `443/udp`) | the relay (`51821/udp`, `443/udp`) |

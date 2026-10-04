@@ -11,7 +11,7 @@
 
 ## Release flow
 
-1. Work on `feat/...`, open a PR into `dev`. CI runs syntax checks, a secrets scan and the wording guard.
+1. Work on `feat/...`, open a PR into `dev`. CI runs syntax checks, a secrets scan, the wording guard and a link check (`.github/workflows/links.yml`; every exclusion, with its reason, in `lychee.toml`).
 2. When `dev` is ready for a release, tag a candidate on it: `git tag v0.2.0-rc.1 && git push --tags`. The release workflow publishes a **pre-release** with `homeport-skill.zip` — test-install that zip in Claude.
 3. Fix on `dev`, tag `-rc.2` if needed.
 4. Open a PR `dev → main`, merge (merge commit, not squash — keep history). Tag `v0.2.0` on `main`, push the tag. The workflow publishes the release; Pages redeploys the landing if `docs/` changed.
@@ -29,7 +29,7 @@ Semantic. The skill's user-facing behaviour is the API: a change to what the ins
 
 ## Language and wording
 
-English only. `SKILL.md` and `references/*.md` are English instructions; code, comments, commit messages and the trigger phrases in the skill description are English too. The only human-facing wording files are `references/lang/en.md` (what the agent says at each step) and `references/lang/handout-en.md` (the handout — the same text `scripts/make-handout.py` writes; change the two together). Any other language is the agent's live translation of those two files, so there are no other language files and none are added. `skills/homeport/SKILL.md` is generated from the root `SKILL.md` frontmatter; if you change the description, regenerate it (CI fails otherwise).
+English only. `SKILL.md` and `references/*.md` are English instructions; code, comments, commit messages and the trigger phrases in the skill description are English too. The only human-facing wording files are `references/lang/en.md` (what the agent says at each step) and `references/lang/handout-en.md` (the handout — the same text `scripts/make-handout.py` writes; change the two together). Any other language is the agent's live translation of those two files, so there are no other language files and none are added. `skills/homeport/SKILL.md` is generated from the root `SKILL.md` frontmatter; if you change the frontmatter (name, description, compatibility — every key), regenerate it (CI fails otherwise).
 
 ## Wording rules
 

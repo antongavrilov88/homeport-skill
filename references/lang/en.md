@@ -44,6 +44,8 @@ Money — one paragraph, no confirmation asked. `<price>` is the monthly price t
 
 Why, said to them: "We need a computer abroad that runs around the clock. We'll rent it from DigitalOcean — it's like web hosting, except you get the whole server. <price> a month before tax — the price we just went over."
 
+Whose it is: "The server will be yours: Homeport can't switch it off or look inside it, and your card goes straight to DigitalOcean, never to Homeport."
+
 The steps, one at a time: "Open cloud.digitalocean.com/registrations/new." → "Sign up with an email and a password, or with Google." → "Confirm the email — there's a letter with a link." → "Add a payment method."
 
 The card: "About a dollar will be charged to check the card and refunded straight away."
@@ -56,6 +58,8 @@ Never: suggest an account in someone else's name, or a way around the card check
 
 "So that I can do everything for you, I need a key to your account. It's a long line of text. It gives full access, which is why we'll revoke it right after the setup — and then it's useless."
 
+What it's for: "It lets me rent one server for you, in your own account, and we revoke it together at the end."
+
 The steps: "Open cloud.digitalocean.com." → "In the left menu, at the bottom: API." → "The Tokens tab, the button Generate New Token." → "Name: `vpn`, or anything." → "Expiration: 30 days." → "Scopes: Full Access." → "Generate Token." → "The line starting `dop_v1_` is shown once. Copy it whole and paste it here."
 
 Must be said aloud: "This line will pass through our conversation. When we're done, we'll revoke it and, if needed, issue a new one — so even if this chat leaked somewhere one day, the key is already dead."
@@ -67,6 +71,8 @@ Revoking later: "The same page: API → Tokens → the three dots next to the to
 "We need an address of your own on the internet, like `ivanov-notes.com`. About ten dollars a year. It's for the disguise: whoever looks from the outside sees you simply visiting some website."
 
 Where: "Namecheap, Porkbun or Cloudflare — cheap, paid by card. Or the registrar you already use."
+
+Whose it is: "It will be registered to you, so only you can renew or move it; keep it apart from anything personal: it's the disguise."
 
 What to pick: "Any free name. `.com`, `.net`, `.org`, `.me` are all fine. Skip the very cheap ones — `.xyz`, `.top`, `.click` — they get blocked in bulk."
 
@@ -106,6 +112,18 @@ What you need afterwards: "The server's address, the login (usually `root`) and 
 
 Say it straight: "This server's password will also pass through our conversation. After the install I'll show you how to change it — it's one command."
 
+The address check, before the install — about two minutes. Why: "Before we set anything up, let's check that their phones can reach this server at all. Some mobile networks only let certain addresses through, and swapping the address now is easy — after every phone is set up, it isn't."
+
+The test rule, if their panel has a firewall or a security group: "Add one more rule next to the others: incoming, TCP, port 80. It's only for this test — we'll delete it in a few minutes."
+
+The test: "Take a phone that's on the family's mobile network — yours if you're there, or ask one of them. Turn Wi-Fi off, so it's on mobile data. Open this link: http://<relay address> — does it say 'It works'?" If the family is on more than one mobile network: "One phone on each network, please — they don't all let the same addresses through." If the phone warns that the page isn't secure: "That's expected for this test page — go on to the page."
+
+If it says "It works" and the address isn't static yet: "Good — their network lets this address through. Now a couple of clicks to make it permanent, so it never changes: in their panel that's called a static or reserved address. I'll tell you exactly where."
+
+If it doesn't open: "That's not something you did: this network doesn't let this particular address through. We'll take another address and try again — a couple of minutes." After two or three: "This provider's addresses don't get through on their network. Let's try another provider in the same country — better to find out now than after everyone's phones are set up."
+
+Afterwards: "Test done — you can delete the port 80 rule now." If they ask whether that settles it: "It shows their phones can reach the server. The real test comes after the setup, on the first phone."
+
 ## §7 Running one command on the server
 
 "I'll send you a file and two lines. You open one program on your computer and paste them in. It takes a minute, and then the server sets itself up in about ten."
@@ -132,6 +150,8 @@ Adding a device: "In the app tap +, choose 'Create from QR code', point the came
 
 On a computer: "Instead of a QR the panel gives you a `.conf` file; in the app choose 'Import tunnel(s) from file'."
 
+One key per device: "Each device gets its own key, made on your server: if a phone is lost, delete that one device in the panel, and the others keep working."
+
 The system prompt: "The phone will ask once whether to allow this VPN to be set up. That's the normal system question — say yes."
 
 The first device, before you send its code: "The very first device I set up from the server and send you the code for, because the panel only opens from inside the VPN and nothing is inside it yet. This one code passed through our chat; once you're connected you can make a fresh one in the panel and delete this one, if you like. From the second device on, you do it yourself in the panel, with me watching."
@@ -157,6 +177,8 @@ The panel is in English. The buttons the person needs (full list at the end of t
 Then: "I've just sent a test — did it arrive?"
 
 ## §10 Cleaning up (a day or two later, one message)
+
+Why, said to them: "Once the key is revoked, nothing from this conversation can touch your account again."
 
 - revoke the access key (§2, "revoking later");
 - delete the server password and the key from the conversation, if they were sent here;
