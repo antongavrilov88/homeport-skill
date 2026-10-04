@@ -34,9 +34,10 @@ if grep -q '"vnext"' "$XRAY_CONFIG" 2>/dev/null; then
 else
   DOM=$(python3 -c "import json;print(json.load(open('$XRAY_CONFIG'))['inbounds'][0]['streamSettings']['realitySettings']['serverNames'][0])" 2>/dev/null)
   if [ -n "$DOM" ]; then
-    echo | timeout 10 openssl s_client -connect "$COVER" -servername "$DOM" 2>/dev/null \
-      | grep -q "Verify return code: 0" && ok "cover site serves a valid certificate" \
-      || no "no certificate served for $DOM: REALITY will stand out"
+    # -verify_hostname: without it any trusted chain passes, whatever name it is for
+    echo | timeout 10 openssl s_client -connect "$COVER" -servername "$DOM" -verify_hostname "$DOM" 2>/dev/null \
+      | grep -q "Verify return code: 0" && ok "cover site serves a valid certificate for $DOM" \
+      || no "no valid certificate for $DOM: REALITY will stand out"
     ss -lntp 2>/dev/null | grep -q ':443 ' && ok "443/tcp is listening" || no "nothing listens on 443/tcp"
   fi
 fi
