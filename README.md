@@ -275,3 +275,5 @@ I'm Anton Gavrilov, a frontend engineer. I built this for my parents, then for a
 ## License
 
 [MIT](LICENSE). Use it, fork it, sell setups with it — just keep the notice.
+
+Scratch for #133: [a page that does not exist](https://github.com/antongavrilov88/homeport/blob/main/does-not-exist-133.md)
