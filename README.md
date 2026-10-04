@@ -6,7 +6,7 @@ Homeport is a free, open-source skill for AI coding agents: plain instructions p
 
 How long it takes: your clicks, then about 10 minutes while it installs. A new domain takes 15 minutes to a few hours to go live, and a new hosting account is sometimes reviewed for a few hours.
 
-The server is yours. The domain is yours. The keys are made on your machine and installed on your server; the first device's code passes through the chat, and you can replace it from the panel. There is no Homeport account, no Homeport backend, and nothing for anyone to shut down except your own server — which you can rebuild.
+The server is yours. The domain is yours. The REALITY keys, the panel's admin code and the ntfy password are made on your machine; the WireGuard keys, the server's and every device's, are made on your server. The first device's code passes through the chat with your agent, and you can replace it from the panel; your keys and passwords never pass through Homeport. There is no Homeport account, no Homeport backend, and nothing for anyone to shut down except your own server — which you can rebuild.
 
 > Made for one situation: people you care about live where the internet is filtered, and every "install our app" VPN keeps dying. Works in both directions — reaching services back home from abroad, or reaching the world from behind a filter. Reaching home needs the server *in* the home country: the automated path creates servers only in DigitalOcean's regions (listed in [`references/providers/digitalocean.md`](references/providers/digitalocean.md)); anywhere else you create the server yourself at a provider there — any Ubuntu 24.04 VPS, a few more clicks on your side.
 

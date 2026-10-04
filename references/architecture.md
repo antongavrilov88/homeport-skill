@@ -54,7 +54,7 @@ VLESS+REALITY. What you lose without the relay:
    DPI uses to pick candidates for a closer look.
 2. Control. Changing the exit, changing the route, failing over — today that is one
    command on one machine. Without the relay it is a visit to every user.
-3. The panel, automatic failover and split routing all live on the relay.
+3. Automatic failover and split routing live on the relay; the panel moves to the exit.
 4. If things move to allowlists, a local cloud address is more likely to stay
    permitted than a foreign one.
 

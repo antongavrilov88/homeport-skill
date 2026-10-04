@@ -11,7 +11,7 @@
 
 ## Release flow
 
-1. Work on `feat/...`, open a PR into `dev`. CI runs syntax checks, a secrets scan and the wording guard.
+1. Work on `feat/...`, open a PR into `dev`. CI runs syntax checks, a secrets scan, the wording guard and a link check (`.github/workflows/links.yml`; every exclusion, with its reason, in `lychee.toml`).
 2. When `dev` is ready for a release, tag a candidate on it: `git tag v0.2.0-rc.1 && git push --tags`. The release workflow publishes a **pre-release** with `homeport-skill.zip` — test-install that zip in Claude.
 3. Fix on `dev`, tag `-rc.2` if needed.
 4. Open a PR `dev → main`, merge (merge commit, not squash — keep history). Tag `v0.2.0` on `main`, push the tag. The workflow publishes the release; Pages redeploys the landing if `docs/` changed.
