@@ -18,6 +18,6 @@
 
 **Account** — `accounts.hetzner.com` → sign up → confirm the email → complete the identity check if asked → add a payment method.
 
-**Server** — `console.hetzner.cloud` → **New project** → **Add Server** → Location (nearest to the users or to the relay) → Image **Ubuntu 24.04** → Type **Shared vCPU**, the cheapest → Networking: keep **Public IPv4** on → SSH keys: **Add SSH key** and paste the contents of `~/.ssh/vpn-kit.pub` (or the person's own key) → Name `vpn-exit` → **Create & Buy now**. The IP is shown on the server page.
+**Server** — `console.hetzner.cloud` → **New project** → **Add Server** → Location (nearest to the users or to the relay; for services from home, in the home country) → Image **Ubuntu 24.04** → Type **Shared vCPU**, the cheapest → Networking: keep **Public IPv4** on → SSH keys: **Add SSH key** and paste the contents of `~/.ssh/vpn-kit.pub` (or the person's own key) → Name `vpn-exit` → **Create & Buy now**. The IP is shown on the server page.
 
 **Then** — DNS at the registrar or in **Hetzner DNS** (three A records `@`, `www`, `push`, TTL 300), `dns-check`, and `setup-exit.sh` over SSH as root (`references/provisioning.md`, "Delivering the installer").

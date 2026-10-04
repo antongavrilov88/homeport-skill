@@ -10,7 +10,7 @@ For any other language the agent translates the generated file.
 Hand it over as a file (SendUserFile). Do NOT publish it: it holds the panel
 code and the notification password.
 """
-import argparse, json
+import argparse, json, sys
 
 
 T = """# Your VPN — the handout
@@ -121,6 +121,14 @@ def main():
     a = ap.parse_args()
     p = json.load(open(a.params, encoding="utf-8"))
     single = p.get("mode") == "single"
+    # gen-secrets.py writes both addresses empty; stop before writing anything rather
+    # than hand over a table with a blank server address.
+    if not p.get("exit_ip"):
+        sys.exit("params.json has no exit_ip yet: it is written in step 3 of SKILL.md, "
+                 "once the exit machine has its address")
+    if not single and not p.get("relay_ip"):
+        sys.exit("params.json has no relay_ip yet: it is written in step 5 of SKILL.md, "
+                 "after the relay's install")
     gw = p.get("wg_subnet", "10.67.0") + ".1"
     dash = f'http://{gw}:{p.get("dashboard_port", 8088)}'
     notifications = bool(p.get("ntfy_alert_token") or p.get("push_domain"))
@@ -159,14 +167,14 @@ It only writes when it matters: when something broke and when it fixed itself. T
                     "local sites stay reachable, foreign sites are unavailable for that time. "
                     "When the main channel is repaired, everyone is moved back, also by itself.")
         scheme = "two servers: a relay in your country + an exit abroad"
-        relay_row = f'\n| Relay server | `{p.get("relay_ip", "—")}` |'
+        relay_row = f'\n| Relay server | `{p["relay_ip"]}` |'
         exit_label = " abroad"
         route_buttons = "\n**All → tunnel** / **All → direct** — everyone through the tunnel / everyone direct."
 
     text = T.format(dash=dash, token=p.get("dashboard_token", ""), notify=notify.strip(),
                     money=money, failover=failover,
                     site=f'https://{p["domain"]}', domain=p["domain"],
-                    exit_ip=p.get("exit_ip", "—"), exit_label=exit_label,
+                    exit_ip=p["exit_ip"], exit_label=exit_label,
                     relay_row=relay_row, scheme=scheme, route_buttons=route_buttons,
                     meaning=meaning)
     open(a.out, "w", encoding="utf-8").write(text)

@@ -24,6 +24,9 @@ Rules (the same ones the script applies):
      single profile (it has no tunnel and no drill).
   4. Output file: handout.md. Send it as a file, with your environment's way of handing over a file.
      Never publish it as a page: it contains the panel code and the alert password.
+  5. ADDRESSES: do not render the handout while exit_ip in params.json is empty, or
+     relay_ip in the relay profile. exit_ip is written in step 3 of SKILL.md, relay_ip
+     in step 5: do those first. The script makes the same stop.
 -->
 # Your VPN — the handout
 
