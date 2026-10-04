@@ -27,11 +27,30 @@ of a real site, and that stands out more than having no VPN at all.
 
 ## The install is stuck on apt (`waiting` lines in the log)
 
-Cloud-init on a fresh machine competes with unattended upgrades. The installer
-waits up to five minutes and then moves on. If it hangs longer than that:
+On a fresh machine cloud-init and the unattended upgrades may still be using apt.
+The installer tries `apt update` three times, 20 seconds apart (each failure logs
+`apt update failed (N), waiting`), then goes on without it. The package install
+runs once and waits up to 10 minutes for apt's lock, printing nothing meanwhile. If
+it fails, the installer stops: `/var/log/vpn-kit-install.log` ends with apt's `E:`
+lines and has no `READY` line. Wait until apt is free:
 
 ```bash
-ssh root@<IP> 'systemctl stop unattended-upgrades; bash /root/setup-exit.sh'
+ssh root@<IP> 'cloud-init status --wait; systemctl is-active apt-daily apt-daily-upgrade'
+```
+
+- `status: error` after a cloud-init install → expected: the installer that stopped
+  ran inside cloud-init.
+- `activating` on either of the last two lines → apt's daily update or the
+  unattended upgrades are still running. Ask again in a few minutes, or stop the
+  upgrade at its next safe point with `systemctl stop unattended-upgrades`, which
+  returns once the upgrade has stopped.
+
+Then run the installer again; it is idempotent (`provisioning.md`, "Running again").
+The kit is unpacked in `/opt/vpn-kit` whichever way it was delivered, so this works
+after cloud-init and after SSH alike; `/root/setup-exit.sh` exists only after `scp`:
+
+```bash
+ssh root@<IP> 'bash /opt/vpn-kit/exit/install.sh 2>&1 | tee -a /var/log/vpn-kit-install.log'   # relay: relay/install.sh
 ```
 
 ## Clients connect, but there is no internet
