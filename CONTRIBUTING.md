@@ -29,7 +29,7 @@ Semantic. The skill's user-facing behaviour is the API: a change to what the ins
 
 ## Language and wording
 
-English only. `SKILL.md` and `references/*.md` are English instructions; code, comments, commit messages and the trigger phrases in the skill description are English too. The only human-facing wording files are `references/lang/en.md` (what the agent says at each step) and `references/lang/handout-en.md` (the handout — the same text `scripts/make-handout.py` writes; change the two together). Any other language is the agent's live translation of those two files, so there are no other language files and none are added. `skills/homeport/SKILL.md` is generated from the root `SKILL.md` frontmatter; if you change the description, regenerate it (CI fails otherwise).
+English only. `SKILL.md` and `references/*.md` are English instructions; code, comments, commit messages and the trigger phrases in the skill description are English too. The only human-facing wording files are `references/lang/en.md` (what the agent says at each step) and `references/lang/handout-en.md` (the handout — the same text `scripts/make-handout.py` writes; change the two together). Any other language is the agent's live translation of those two files, so there are no other language files and none are added. `skills/homeport/SKILL.md` is generated from the root `SKILL.md` frontmatter; if you change the frontmatter (name, description, compatibility — every key), regenerate it (CI fails otherwise).
 
 ## Wording rules
 

@@ -21,9 +21,13 @@ jobs:
           def fm(path):
               t = open(path, encoding="utf-8").read()
               block = re.match(r"^---\n(.*?)\n---\n", t, re.S).group(1)
-              return dict(re.findall(r"^(name|description):\s*(.*)$", block, re.M))
+              # Every top-level key, whatever its name; a value runs to the next top-level key,
+              # so a value written over several lines is compared too.
+              parts = re.split(r"^([^\s#][^:\n]*):", block, flags=re.M)  # [before, key, value, key, value, ...]
+              return {k: v.rstrip("\n") for k, v in zip(parts[1::2], parts[2::2])}
           root, wrap = fm("SKILL.md"), fm("skills/homeport/SKILL.md")
-          assert root == wrap, "skills/homeport/SKILL.md frontmatter must equal SKILL.md's: regenerate it"
+          diff = sorted(k for k in root.keys() | wrap.keys() if root.get(k) != wrap.get(k))
+          assert not diff, f"frontmatter keys differ between SKILL.md and skills/homeport/SKILL.md: {', '.join(diff)}; regenerate skills/homeport/SKILL.md from SKILL.md's frontmatter"
           plugin = json.load(open(".claude-plugin/plugin.json"))
           market = json.load(open(".claude-plugin/marketplace.json"))
           assert plugin["name"] == "homeport" and market["plugins"][0]["name"] == "homeport" and market["name"] == "homeport"
