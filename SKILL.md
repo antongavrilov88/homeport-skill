@@ -181,7 +181,7 @@ Deliver and run it **over SSH only** (`references/provisioning.md`). If you have
 
 Check: `bash /usr/local/sbin/vpn-verify.sh`. Write `relay_ip` into `params.json`.
 
-**Tell the person in plain words** (`lang/en.md`): right now everyone connects directly and the bypass is not on yet. That is deliberate: first make sure the connection works, then switch the bypass on one device at a time and watch that nothing fell over.
+**Tell the person in plain words** (`lang/en.md`): right now everyone connects directly and nobody goes through the tunnel yet. That is deliberate: first make sure the connection works, then switch one device at a time to go through the tunnel and watch that nothing fell over.
 
 **What the relay does about allow-lists, and what you say about it.** The first hop is WireGuard to a domestic address, on `51821/udp` and also on `443/udp` for networks that cut everything else. A domestic address is *more likely* to stay reachable on an allow-list-only network than any foreign one — more likely, not guaranteed. That is why the first device is tested on mobile data before anyone else gets a QR code (step 7). If a network lets nothing through even on 443, say plainly that no protocol gets around an allow-list; the honest answer beats a week of "try again".
 
@@ -214,7 +214,7 @@ From the second device on, by §8: the person opens the panel from the device th
 **[relay]** The order matters here:
 
 1. The first device is a phone **on mobile data, Wi-Fi off**, on the users' side. Connect; "does youtube open?" — that is the direct route through the relay.
-2. Then switch the bypass on for that one device (the route switch on its row in the panel, or **Route: through the tunnel** when creating it) and ask the same question again.
+2. Then switch that one device to go through the tunnel (**→ tunnel**, the route switch on its row in the panel, or **Route: through the tunnel** when creating it) and ask the same question again.
 3. **Only after that hand out QR codes to anyone else.** Verify from a phone on mobile data first — a relay that only works over home Wi-Fi is not verified.
 4. **If Wi-Fi works and mobile data does not**, deal with it before anything else, in this order: re-issue that device on `alt_port` 443 (**443 (strict networks)**) and test on mobile data again; if it still will not connect, the relay's own address is not getting through that network, and the fix is a **different provider in the users' country**, not another setting. This is why the test comes before the QR codes: the relay's IP is written into every config the panel issues, so moving the relay later means re-issuing every device.
 5. Two warnings the person needs now, not after the first incident (`lang/en.md` §8): mobile operators sometimes cut UDP on high ports — issue phones on port 443 when in doubt; and if their operator starts dropping the tunnel, the watchdog moves everyone to the direct route within a minute or two — local sites stay reachable, foreign sites are unavailable for that time — and moves them back when the tunnel returns. "The VPN is on but sites don't open" is that state, not a broken system.
@@ -265,7 +265,7 @@ Both profiles end at the same scripts. What differs:
 | Panel, watchdog, WireGuard live on | the exit | the relay |
 | Split routing | none — everything goes through the server | `/etc/vpn-monitor/direct-domains.txt` on the relay (ships seeded with payment and card networks that commonly refuse or step up verification from a data-centre address; add the household's own banks and apps from the panel or the file) plus `home_geoip` |
 | Drill (`vpn-drill.sh`) | not installed; nothing to fail over to | `--check` at once; full run with consent; monthly by timer |
-| First device | any network | phone on mobile data first, then the bypass, then everyone else |
+| First device | any network | phone on mobile data first, then the same phone through the tunnel, then everyone else |
 | `client-link.py` (`vless://`) | the normal path for Hiddify / v2rayNG users | the operator's spare entrance past the relay |
 | Whose traffic quota | the exit's (1 TB a month on the s-1vcpu-1gb droplet) | the exit's **and** the relay's — everything passes twice |
 
@@ -279,7 +279,7 @@ Both profiles end at the same scripts. What differs:
    `bash -c 'S=$(grep -n "^base64 -d" out/setup-relay.sh|cut -d: -f1); E=$(grep -n "^__VPNKIT_PAYLOAD__$" out/setup-relay.sh|cut -d: -f1); sed -n "$((S+1)),$((E-1))p" out/setup-relay.sh|base64 -d|tar xzO vars.sh|grep REALITY_PRIVATE'`
    The expected output is exactly `REALITY_PRIVATE=''` — an empty value. Anything after the `=` means the build is wrong; stop.
 6. **The cover site never impersonates someone else's company, shop or review site.** The cover must be real and the person's own. The template in `scripts/payload/site/` is a stub to be rewritten, not something to pass off as somebody's business.
-7. **Never help bypass card verification** and never suggest opening an account in someone else's name. If there is nothing to pay with, offer another provider (`references/provisioning.md`, "No card that works?").
+7. **Never help anyone get around a card check** and never suggest opening an account in someone else's name. If there is nothing to pay with, offer another provider (`references/provisioning.md`, "No card that works?").
 
 ## Privacy — say it yourself, before they ask
 

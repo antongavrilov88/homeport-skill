@@ -147,9 +147,9 @@ ssh root@ADDRESS 'bash /root/setup-relay.sh'
 
 **The panel:** opened from a device that is already on the VPN, at `http://<wg_subnet>.1:<dashboard_port>` (default `http://10.67.0.1:8088`); the admin code is asked once per browser. **Its labels are English** — the glossary is in `lang/en.md`; for a person who does not read English, say so once before this step and name each button as it is written.
 
-**[relay] Order:** the first device is a phone on mobile data with Wi-Fi off → "does youtube open?" → switch the bypass on for that device → the same question → only then QR codes for everyone else. Phones on strict operators: port 443. The two warnings (high UDP ports; what failover looks like) are in `lang/en.md` §8.
+**[relay] Order:** the first device is a phone on mobile data with Wi-Fi off → "does youtube open?" → switch that device to go through the tunnel (**→ tunnel** on its row in the panel) → the same question → only then QR codes for everyone else. Phones on strict operators: port 443. The two warnings (high UDP ports; what failover looks like) are in `lang/en.md` §8.
 
-**You verify:** "does youtube open?" from them; `sudo wg show wg-clients` on the server shows a fresh handshake for the new peer. [relay] After the bypass: the device's address is in the `proxied_src` set and the panel shows it as **tunnel**.
+**You verify:** "does youtube open?" from them; `sudo wg show wg-clients` on the server shows a fresh handshake for the new peer. [relay] Once it goes through the tunnel: the device's address is in the `proxied_src` set and the panel shows it as **tunnel**.
 
 ---
 
