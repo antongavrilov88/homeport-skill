@@ -183,7 +183,7 @@ check that no stray machines have appeared.
 | Path | What it is |
 |---|---|
 | `/usr/local/etc/xray/config.json` | Xray config (REALITY client) |
-| `/etc/xray/xray-tproxy.nft` | interception; the `proxied_src` and `bypass` sets |
+| `/etc/xray/xray-tproxy.nft` | interception; the `proxied_src` set (devices that go through the tunnel) and the `bypass` set (destinations that never go into the tunnel: private and reserved ranges, the relay's own address, the exit's) |
 | `/etc/xray/wgports.nft` | redirect udp/443 → WireGuard port (unit `vpn-wgports`) |
 | `/usr/local/sbin/vpn-*.py`, `vpn-*.sh` | monitor, watchdog, split routing, diagnostics, drill |
 | `/usr/local/share/vpn-monitor/index.html` | the panel |

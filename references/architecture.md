@@ -107,7 +107,8 @@ notification.
   viewers. The cure is the next size up (2 TB), not a redesign.
 - **CPU** tops out at roughly a gigabit — which is to say it does not top out.
 - **The relay's outbound traffic** is billed separately at its provider's rates.
-  Split routing (home-country domains bypassing the tunnel) cuts it noticeably.
+  Split routing (the exceptions: home-country domains that go direct from the
+  relay, not through the tunnel) cuts it noticeably.
 
 ## Risks and horizons
 

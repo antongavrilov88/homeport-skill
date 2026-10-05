@@ -16,7 +16,7 @@ The server is yours. The domain is yours. The REALITY keys, the panel's admin co
 
 - **A protocol that looks like ordinary web traffic — on the relay link and for VLESS apps.** VLESS + XHTTP + REALITY on Xray, on port 443, with a real website under your own domain as the cover. To a probe your server *is* a normal HTTPS site, because it is one. It carries the relay → exit hop of the `relay` profile and the `vless://` link for people who use a VLESS app (Hiddify, v2rayNG). On the default one-server layout your devices don't use it: they connect with plain WireGuard, straight to the server abroad. Some networks detect or slow down plain WireGuard; on those, the `relay` profile or a VLESS app is the better choice.
 - **WireGuard for the devices.** Phones, laptops, TVs and routers connect with the official free WireGuard app. Scan a QR, flip a switch, done. A second port on UDP/443 for hotel and mobile networks that cut everything else.
-- **A web panel** (reachable only from inside the VPN): who is online, how much they used, add or remove a device with a QR code, and on two servers manage the list of domains that bypass the tunnel.
+- **A web panel** (reachable only from inside the VPN): who is online, how much they used, add or remove a device with a QR code, and on two servers manage the exceptions, the domains that go direct from the relay instead of through the tunnel.
 - **A watchdog** that checks the tunnel every 30 seconds, restarts what it can and pushes a notification to your phone. On two servers (the `relay` profile) it also moves everyone to the direct route and back, and a monthly fire drill (a deliberate two-minute outage) proves that failover actually works, not just "is configured". One server has nothing to fail over to, so it has no failover and no drill.
 - **Split routing, on two servers only** (the `relay` profile). Apps that refuse VPN connections — banks, government sites — go direct from the home-country relay; everything else goes through the tunnel. Optional per-country GeoIP rule. On one server everything goes through the server.
 - **Push notifications** through your own [ntfy](https://ntfy.sh) instance on the same server, and every alert is also posted to a random topic on public ntfy.sh (see [Privacy, stated plainly](#privacy-stated-plainly)).
@@ -257,7 +257,7 @@ Internally the scripts still call themselves `vpn-kit` (`/opt/vpn-kit`, `/root/v
 - One server per tag at any time; never touches machines it didn't create; never deletes the old server before the new one is verified.
 - The REALITY private key goes into no chat, no project and no relay installer. It exists in `params.json` on your machine, inside `out/setup-exit.sh` (and so in the server's cloud-init metadata when it is created that way) and on the exit server; the build step strips it from the relay installer and the skill checks that it did.
 - The cover site is never a fake company, shop or review page. It's a real, boring, honest site — yours.
-- Never helps bypass card verification, never suggests registering an account in someone else's name.
+- Never helps anyone get around a card check, never suggests registering an account in someone else's name.
 - Never starts creating servers from an unattended or scheduled session: it costs money and it's irreversible.
 
 ---

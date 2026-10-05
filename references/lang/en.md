@@ -162,7 +162,7 @@ The check: "Open youtube.com — does it open?"
 
 The panel is in English. The buttons the person needs (full list at the end of this file): **+ New client**; **Create and show QR**; **Download .conf**; **Port: 51821 (standard) / 443 (strict networks)**; **Route: through the tunnel / direct** (relay only). For a person who does not read English, name each button exactly as it is written and say what it does in their language, once, before the first device.
 
-[relay] Before anyone else gets a QR: "Let's try the first phone on mobile data, with Wi-Fi off — that's the network that matters." Then: "Now I'll switch the bypass on for this phone. Same question: does YouTube open?"
+[relay] Before anyone else gets a QR: "Let's try the first phone on mobile data, with Wi-Fi off — that's the network that matters." Then: "Now I'll switch this phone to go through the tunnel. Same question: does YouTube open?"
 
 [relay] If Wi-Fi works and mobile data does not, fix that before anything else, in this order: re-issue this device on `alt_port` 443 (**443 (strict networks)**) and try mobile data again; if it still will not connect, the relay's own address is not getting through that network, and the answer is a different provider in the users' country — not another setting. Do it now: the relay's IP is written into every config the panel issues, so moving the relay after the QR codes go out means re-issuing every device.
 
@@ -188,7 +188,7 @@ Why, said to them: "Once the key is revoked, nothing from this conversation can 
 ## Between the steps
 
 - While the exit installs: "This will take about ten minutes. Meanwhile, let's put the app on your phone."
-- [relay] After the relay is up: "Right now everyone connects directly, the bypass isn't on yet. That's on purpose: first we make sure the connection works, then we switch the bypass on one device at a time and watch that nothing falls over."
+- [relay] After the relay is up: "Right now everyone connects directly, nobody goes through the tunnel yet. That's on purpose: first we make sure the connection works, then we switch one device at a time to go through the tunnel and watch that nothing falls over."
 - [relay] Drill consent: "Want me to test it for real? I'll break the main channel for two minutes and watch the system get itself out. If nobody is watching a film right now, this is the moment."
 - The cover site: "At your address there's now a page of notes about servers. It's there so that a check sees an ordinary website. Over time it's better to replace the text with your own — even three paragraphs about fishing. The same template on a dozen addresses becomes a tell." For a person who does not write in Russian, say instead: "At your address there's now a page of notes about servers, in Russian. It's there so that a check sees an ordinary website, and it works best when the text is your own — give me a topic and I'll rewrite it in your language now, before we finish."
 - Privacy: "You'll see that your mother's phone used two gigabytes, and you won't see what she watched. Even if you wanted to — the data isn't there."

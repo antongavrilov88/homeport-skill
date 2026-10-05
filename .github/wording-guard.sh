@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Three checks on the public surface. Fails when a country-specific term is back,
-# when a line frames the product as circumvention (second check), or when the old
-# product name "Burrow" is used (third check).
+# Four checks on the public surface. Fails when a country-specific term is back,
+# when a line frames the product as circumvention (second check), when the old
+# product name "Burrow" is used (third check), or on the word "bypass" (fourth check).
 # The lists and the approved vocabulary live in CONTRIBUTING.md ("Wording rules").
 # Case-insensitive, Latin and Cyrillic; the Cyrillic terms are stems, so every case
 # ending matches. Language labels ("the panel is in Russian", lang/ru.md) are
@@ -21,9 +21,10 @@ if [ -n "$HITS" ]; then
   exit 1
 fi
 
-# Circumvention framing. Narrow patterns on purpose: "bypassing the relay" and
-# "apps that refuse VPN connections keep working" pass; the seven phrasings below fail.
-CIRCUMVENTION="bypass(es|ing)? (the )?(block|censor|filter)|evad(e|es|ing) (block|censor|detect|filter)|circumvent|get around (the )?block|when (it'?s |you'?re )?blocked|unblock|keeps? working when"
+# Circumvention framing. Narrow patterns on purpose: "apps that refuse VPN connections
+# keep working" passes; the six phrasings below fail. The word "bypass" fails in any
+# form on its own, in the fourth check.
+CIRCUMVENTION="evad(e|es|ing) (block|censor|detect|filter)|circumvent|get around (the )?block|when (it'?s |you'?re )?blocked|unblock|keeps? working when"
 FRAMING_HITS=$(grep -rniE "$CIRCUMVENTION" \
   --exclude-dir=.git --exclude='.git' --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \
   --exclude='wording-guard.sh' --exclude='CONTRIBUTING.md' \
@@ -50,6 +51,32 @@ OLD_HITS=$(grep -rniw 'burrow' \
 if [ -n "$OLD_HITS" ]; then
   echo "old product name found; say Homeport (see CONTRIBUTING.md, Wording rules):"
   echo "$OLD_HITS"
+  exit 1
+fi
+
+# The word "bypass" (bypasses, bypassed, bypassing), whole word, case-insensitive. The
+# panel has a word for each thing the docs used it for: a device's route goes "through
+# the tunnel" or "direct", and the domains that skip the tunnel are the "exceptions".
+# One name stays: the relay's nftables set is called `bypass` on every installed relay.
+# BYPASS_ALLOWED cuts that name out of a hit line where it is allowed, then the rest of
+# the line is checked again, so the word anywhere else on the same line still fails.
+# Allowed: the set's two lines in the relay installer, and the set named in backticks
+# ("the `bypass` set", "`bypass` sets").
+BYPASS='\bbypass(es|ed|ing)?\b'
+BYPASS_ALLOWED='s#^((.*/)?scripts/payload/relay/install\.sh:[0-9]+:)[[:space:]]*(set bypass [{]|ip daddr @bypass return)$#\1#
+s#`bypass` sets?([^[:alnum:]_]|$)#\1#g
+s#^[^:]*:[0-9]+:##'
+BYPASS_HITS=$(grep -rniE "$BYPASS" \
+  --exclude-dir=.git --exclude='.git' --exclude='*.png' --exclude='*.jpg' --exclude='*.pyc' \
+  --exclude='wording-guard.sh' --exclude='CONTRIBUTING.md' \
+  "${1:-.}" | while IFS= read -r LINE; do
+    if printf '%s\n' "$LINE" | sed -E "$BYPASS_ALLOWED" | grep -qiE "$BYPASS"; then
+      printf '%s\n' "$LINE"
+    fi
+  done || true)
+if [ -n "$BYPASS_HITS" ]; then
+  echo '"bypass" found; say "through the tunnel" or "exceptions" (see CONTRIBUTING.md, Wording rules):'
+  echo "$BYPASS_HITS"
   exit 1
 fi
 echo "wording guard: 0 hits"

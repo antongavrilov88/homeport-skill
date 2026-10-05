@@ -3,7 +3,7 @@
 
     python3 client-link.py --params params.json [--label home] [--qr link.png]
 
-Such a client goes straight to the exit machine, bypassing the relay. It is the
+Such a client goes straight to the exit machine, past the relay. It is the
 personal spare entry for whoever runs the system: it works even while the relay is down.
 """
 import argparse, json, subprocess, sys, urllib.parse
