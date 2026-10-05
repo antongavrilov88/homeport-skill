@@ -25,6 +25,7 @@ if [ -f "$XRAY_CONFIG" ]; then
   xray run -test -c "$XRAY_CONFIG" >/dev/null 2>&1 && ok "Xray config is valid" || no "Xray config fails its check"
 fi
 
+EXIT_SERVER=""; REALITY_MODE=""     # set below, on the exit only
 if grep -q '"vnext"' "$XRAY_CONFIG" 2>/dev/null; then
   EXP=$(python3 -c "import json;print(json.load(open('$XRAY_CONFIG'))['outbounds'][0]['settings']['vnext'][0]['address'])")
   GOT=$(curl -s -m 20 -x socks5h://127.0.0.1:1080 https://api.ipify.org || true)
@@ -32,14 +33,7 @@ if grep -q '"vnext"' "$XRAY_CONFIG" 2>/dev/null; then
   curl -s -m 8 --interface "$GW" -o /dev/null -w "" https://www.gstatic.com/generate_204 \
     && ok "fallback route (direct exit) works" || no "direct exit from the relay does not work"
 else
-  DOM=$(python3 -c "import json;print(json.load(open('$XRAY_CONFIG'))['inbounds'][0]['streamSettings']['realitySettings']['serverNames'][0])" 2>/dev/null)
-  if [ -n "$DOM" ]; then
-    # -verify_hostname: without it any trusted chain passes, whatever name it is for
-    echo | timeout 10 openssl s_client -connect "$COVER" -servername "$DOM" -verify_hostname "$DOM" 2>/dev/null \
-      | grep -q "Verify return code: 0" && ok "cover site serves a valid certificate for $DOM" \
-      || no "no valid certificate for $DOM: REALITY will stand out"
-    ss -lntp 2>/dev/null | grep -q ':443 ' && ok "443/tcp is listening" || no "nothing listens on 443/tcp"
-  fi
+  EXIT_SERVER=1                   # its own checks need reality_check, so they come after it, below
 fi
 
 # REALITY stays on 443/tcp with the user's own domain as its target. Xray's release
@@ -58,16 +52,29 @@ fi
 # On the exit this also prints the size of the certificate chain the cover site
 # sends: the DER bytes of every certificate in it, summed. Above 8,192 bytes, a
 # known REALITY limit (XTLS issue #6356), it prints a warning, not a failure.
+# The exit's own checks below, the cover site certificate and 443/tcp, are for the
+# REALITY inbound too, wherever it sits in the config: "reality_check name" finds it
+# the same way and prints its first server name (with several, the first one in the
+# config, as for the chain size). Without one they cannot run, and "reality_check
+# unchecked" fails the run with one line that says why: the line it has for that
+# cause anyway (no REALITY at all, a config it cannot read, server names that are
+# not the domain), as a failure, or else a line of its own.
 reality_check() {
-  python3 - "$XRAY_CONFIG" "$KIT_VARS" "$COVER" 2>/dev/null <<'PY'
+  python3 - "$XRAY_CONFIG" "$KIT_VARS" "$COVER" "$@" 2>/dev/null <<'PY'
 import base64, ipaddress, json, re, shlex, subprocess, sys
 
 config, kit_vars, cover = sys.argv[1:4]
+mode = sys.argv[4] if len(sys.argv) > 4 else ""    # "", "name" or "unchecked", see above
 LOCAL_COVER = ("127.0.0.1:8443", "localhost:8443")    # the target the installer writes
 
 
 def say(kind, text):                    # one line per finding: ok / no / warn
-    print(kind + "\t" + text)
+    if mode != "name":                  # "name" prints the name and nothing else
+        print(kind + "\t" + text)
+
+
+def cannot_check(text):                 # a warning; a failure if the exit's own checks did not run
+    say("no" if mode == "unchecked" else "warn", text)
 
 
 def expected_domain():                 # (domain, "") or ("", why not)
@@ -100,6 +107,10 @@ def server_names(rs):
     return [str(n) for n in names] if isinstance(names, list) else []
 
 
+def first_name(inbounds):               # the first REALITY inbound's first server name, or ""
+    return (server_names(inbounds[0][1]) or [""])[0] if inbounds else ""
+
+
 def main():
     try:
         with open(config, encoding="utf-8") as f:
@@ -107,12 +118,18 @@ def main():
         if not isinstance(cfg, dict):
             raise ValueError
     except (OSError, ValueError):
-        say("warn", f"cannot check REALITY: cannot read {config} as JSON")
+        cannot_check(f"cannot check REALITY: cannot read {config} as JSON")
         return
     domain, why = expected_domain()
     inbounds, outbounds = using_reality(cfg.get("inbounds")), using_reality(cfg.get("outbounds"))
+    if mode == "name":
+        print(first_name(inbounds))
+        return
     if not inbounds and not outbounds:
         say("no", "no REALITY inbound or outbound in the Xray config")
+    elif mode == "unchecked" and not (inbounds and domain):    # with a domain, the server-name check says it
+        say("no", "cannot check the cover site certificate or 443/tcp: "
+            + ("the REALITY inbound has no server name" if inbounds else "no REALITY inbound in the Xray config"))
 
     for ib, rs in inbounds:             # the exit, in either profile
         bad = []
@@ -160,7 +177,7 @@ def main():
         say("warn", f"cannot check the REALITY server name: {why}")
 
     if inbounds:                        # the exit: size of the chain the cover site sends
-        sni = domain or (server_names(inbounds[0][1]) or [""])[0]
+        sni = domain or first_name(inbounds)
         cmd = ["openssl", "s_client", "-connect", cover, "-showcerts"] + (["-servername", sni] if sni else [])
         try:
             out = subprocess.run(cmd, input="", capture_output=True, text=True, errors="replace",
@@ -182,12 +199,25 @@ def main():
 try:
     main()
 except Exception as e:                  # an odd config must not silence the check
-    say("warn", f"cannot check REALITY: {e!r}")
+    cannot_check(f"cannot check REALITY: {e!r}")
 PY
 }
+
+if [ -n "$EXIT_SERVER" ]; then
+  DOM=$(reality_check name)       # the REALITY inbound's first server name, wherever it sits
+  if [ -n "$DOM" ]; then
+    # -verify_hostname: without it any trusted chain passes, whatever name it is for
+    echo | timeout 10 openssl s_client -connect "$COVER" -servername "$DOM" -verify_hostname "$DOM" 2>/dev/null \
+      | grep -q "Verify return code: 0" && ok "cover site serves a valid certificate for $DOM" \
+      || no "no valid certificate for $DOM: REALITY will stand out"
+    ss -lntp 2>/dev/null | grep -q ':443 ' && ok "443/tcp is listening" || no "nothing listens on 443/tcp"
+  else
+    REALITY_MODE=unchecked        # no name to check: the REALITY check says why, as a failure
+  fi
+fi
 while IFS=$'\t' read -r kind msg; do
   case "$kind" in ok) ok "$msg" ;; no) no "$msg" ;; *) warn "$msg" ;; esac
-done < <(reality_check)
+done < <(reality_check "$REALITY_MODE")
 
 if command -v wg >/dev/null && wg show wg-clients >/dev/null 2>&1; then
   N=$(wg show wg-clients dump | tail -n +2 | wc -l)
