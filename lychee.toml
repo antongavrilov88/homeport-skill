@@ -21,15 +21,15 @@ accept = ["100..=103", "200..=299", "429"]
 # only exist on a server or on your machine, such as http://127.0.0.1:8088/.
 include_verbatim = false
 
+# Cookie jar, for docs.arvancloud.ir (references/providers/arvancloud.md,
+# references/provisioning.md): it answers a client without its cookies with a 307 back
+# to the same address, live page or not. With the jar lychee sends them on the next hop
+# and gets the real answer, 200 or 404 (checked 2026-10-05). lychee creates the file
+# when it is missing and rewrites it after each run; it lives outside the repository,
+# so it is never committed.
+cookie_jar = "/tmp/homeport-skill-lychee-cookies.json"
+
 exclude = [
-  # docs.arvancloud.ir (references/providers/arvancloud.md, references/provisioning.md):
-  # a client without this host's cookies gets a 307 back to the same address, plus two
-  # cookies. Without a cookie jar lychee follows that redirect until max_redirects and
-  # reports 307 for every page, live or not: a made-up page got the same 307 on
-  # 2026-10-04. The four linked pages were read in a real session on 2026-09-29 (#59);
-  # on 2026-10-04 a lychee run with a cookie jar passed all four and got 404 for the
-  # made-up page.
-  '^https://docs\.arvancloud\.ir/',
   # linkedin.com and www.linkedin.com (README.md): refuse bots. linkedin.com answers
   # 200 with a "Checking your browser - reCAPTCHA" page instead of the profile, and
   # www.linkedin.com answers 999; a made-up profile gets the same answers (measured
