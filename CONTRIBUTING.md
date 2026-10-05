@@ -1,10 +1,12 @@
 # Contributing
 
+This repository is the Homeport skill. The landing page lives in [antongavrilov88/homeport](https://github.com/antongavrilov88/homeport), which has its own [CONTRIBUTING](https://github.com/antongavrilov88/homeport/blob/main/CONTRIBUTING.md); landing changes go there.
+
 ## Branches
 
 | Branch | What it is | Who pushes |
 |---|---|---|
-| `main` | Released code only. Every commit here is a release (or a hotfix that becomes one). Deploys the landing. | merges from `dev` via PR |
+| `main` | Released code only. Every commit here is a release (or a hotfix that becomes one); its `vX.Y.Z` tag publishes `homeport-skill.zip`. | merges from `dev` via PR |
 | `dev` | Integration branch. Always installable, may be ahead of the last release. | merges from feature branches via PR |
 | `feat/<name>`, `fix/<name>`, `docs/<name>` | One change each, branched from `dev`. | you |
 | `hotfix/<name>` | Urgent fix branched from `main`; merged to `main` **and** back into `dev`. | you |
@@ -14,7 +16,7 @@
 1. Work on `feat/...`, open a PR into `dev`. CI runs syntax checks, a secrets scan, the wording guard and a link check (`.github/workflows/links.yml`; every exclusion, with its reason, in `lychee.toml`).
 2. When `dev` is ready for a release, tag a candidate on it: `git tag v0.2.0-rc.1 && git push --tags`. The release workflow publishes a **pre-release** with `homeport-skill.zip` — test-install that zip in Claude.
 3. Fix on `dev`, tag `-rc.2` if needed.
-4. Open a PR `dev → main`, merge (merge commit, not squash — keep history). Tag `v0.2.0` on `main`, push the tag. The workflow publishes the release; Pages redeploys the landing if `docs/` changed.
+4. Open a PR `dev → main`, merge (merge commit, not squash — keep history). Tag `v0.2.0` on `main`, push the tag. The release workflow (`.github/workflows/release.yml`) builds `homeport-skill.zip` and publishes the release with it.
 5. Add the version to `CHANGELOG.md` before tagging, and bump `version` in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` (CI checks they match).
 
 `rc` is a tag, not a branch: with one maintainer a long-lived `release/*` branch adds ceremony without safety. If a second maintainer joins, add `release/x.y` branches then.
@@ -25,7 +27,7 @@ Semantic. The skill's user-facing behaviour is the API: a change to what the ins
 
 ## Commit messages
 
-`type(scope): summary` — types `feat`, `fix`, `docs`, `chore`, `refactor`, `ci`. Scope is `skill`, `installer`, `landing`, `repo`.
+`type(scope): summary` — types `feat`, `fix`, `docs`, `chore`, `refactor`, `ci`. Scope is `skill`, `installer`, `repo`.
 
 ## Language and wording
 
@@ -33,7 +35,7 @@ English only. `SKILL.md` and `references/*.md` are English instructions; code, c
 
 ## Wording rules
 
-Homeport is a world-wide product. The public surface — `SKILL.md`, `references/`, `scripts/` comments and printed strings, `README.md`, `CHANGELOG.md`, this file, `SECURITY.md`, `.github/`, `docs/` — names no country as the reason the product exists. CI runs `.github/wording-guard.sh` on every PR and fails on any of the terms below, case-insensitive, in Latin and Cyrillic.
+Homeport is a world-wide product. The public surface — `SKILL.md`, `references/`, `scripts/` comments and printed strings, `README.md`, `CHANGELOG.md`, this file, `SECURITY.md`, `.github/` — names no country as the reason the product exists. CI runs `.github/wording-guard.sh` on every PR and fails on any of the terms below, case-insensitive, in Latin and Cyrillic.
 
 **Banned:** `RKN`, `Roskomnadzor` / `Роскомнадзор`, `Sberbank` / `Сбер` / `Сбербанк`, `обход блокировок`, `белые списки` / `белый список`, `whitelist` / `whitelists` (when it means a carrier's allow-list in one country), `Russian sites`, `works in Russia`, `in Russia`, `VPN for Russians`, `Russian` + exit / bank / IP / address / card / hosting / provider / law / carrier / network / user / household, `Россия` / `в России` / `российский` / `РФ`.
 
