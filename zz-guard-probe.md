@@ -1,1 +1,1 @@
-Switch the bypass on for this phone.
+We keep a whitelist of addresses.
