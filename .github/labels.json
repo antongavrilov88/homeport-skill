@@ -2,6 +2,7 @@
   {"name": "bug",          "color": "d73a4a", "description": "Something is broken"},
   {"name": "enhancement",  "color": "a2eeef", "description": "New behaviour or an improvement"},
   {"name": "docs",         "color": "0075ca", "description": "README, references, handout"},
+  {"name": "setup-report", "color": "006b75", "description": "From the Setup report form: whether a setup worked, and where it stopped"},
   {"name": "area:skill",   "color": "5319e7", "description": "SKILL.md and references — how Claude runs the setup"},
   {"name": "area:installer","color": "1d76db", "description": "setup-*.sh and the payload on the server"},
   {"name": "area:landing", "color": "0e8a16", "description": "The website"},

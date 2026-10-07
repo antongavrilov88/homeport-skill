@@ -1,0 +1,109 @@
+name: Setup report
+description: Tell us whether your setup worked, and where it stopped if it didn't. Nothing personal is asked.
+title: "Setup report: "
+labels: [setup-report]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A short "it worked" helps as much as a report of where it stopped. Only **Outcome** is required.
+
+        This issue is public, under your GitHub name. Nothing here asks for your name, email, where you live, your server's address or your domain, so leave them out of anything you write or paste.
+
+        **Never paste:**
+        - `params.json`, or anything from it;
+        - the access key to your hosting account (on DigitalOcean it starts with `dop_v1_`), or any other token;
+        - keys of any kind: SSH keys, and a device's QR code or `.conf` file, which is a key too;
+        - the panel code or the alert password.
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Outcome
+      description: "Partly: it works, but not everywhere, for example on Wi-Fi but not on mobile data."
+      options:
+        - worked
+        - didn't work
+        - partly
+    validations:
+      required: true
+  - type: dropdown
+    id: agent
+    attributes:
+      label: AI coding agent
+      description: The agent that ran the setup.
+      options:
+        - Claude Code
+        - Codex CLI
+        - other
+  - type: input
+    id: agent-other
+    attributes:
+      label: Other agent
+      description: 'Only if you picked "other": which agent it was.'
+  - type: dropdown
+    id: layout
+    attributes:
+      label: Layout
+      description: "One server, or two: a relay in the country where the users live, and an exit abroad. If you have the handout, its Layout row says which."
+      options:
+        - single server
+        - relay + exit
+        - not sure
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Hosting provider
+      description: Two servers at two providers? Pick both.
+      multiple: true
+      options:
+        - DigitalOcean
+        - other
+  - type: input
+    id: provider-other
+    attributes:
+      label: Other provider
+      description: >-
+        Only if you picked "other": the provider's name. Leave it empty if the name would give away
+        which country you or your users are in.
+  - type: dropdown
+    id: stopped-at
+    attributes:
+      label: Where it stopped
+      description: If it worked, leave this empty. Otherwise, the step you were on when it stopped or went wrong.
+      options:
+        - installing the skill
+        - hosting account or access key
+        - domain
+        - creating the server
+        - install on the server
+        - verification
+        - connecting a phone
+        - notifications or the handout
+  - type: dropdown
+    id: duration
+    attributes:
+      label: Roughly how long it took
+      description: From your first message to your agent until it worked or you stopped, waiting for the domain or the account included.
+      options:
+        - under 30 minutes
+        - 30 minutes to 1 hour
+        - 1 to 2 hours
+        - 2 to 4 hours
+        - more than 4 hours, in one day
+        - over more than one day
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: |
+        Only if the setup got as far as a server. On the server your devices connect to (your only server, or the relay on two servers), run this, or ask your agent to:
+
+        `sudo cat "$(sudo /usr/local/sbin/vpn-diag.sh)"`
+
+        It saves a snapshot of the server's state and prints it. **Before you paste, replace** (your agent can do it; read the result yourself):
+        - every IP address, except those that start with `10.` (the tunnel's own), with a label such as `<IP-1>`; use the same label each time the same address appears, so a match still shows;
+        - your domain, with `<domain>`;
+        - the server's name, which follows the date at the start of each journal line, with `<server>`, if it says anything about you.
+
+        On two servers, the exit's address and your domain are in the first line and under `domain DNS` and `TLS`; addresses can also turn up under `ping` and in the journal lines.
+      render: text
